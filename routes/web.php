@@ -27,6 +27,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout.post');
 
 // =======================
 // DASHBOARD GLOBAL (setelah login)
@@ -102,6 +103,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/nilai/publish', [\App\Http\Controllers\Guru\NilaiController::class, 'publish'])->name('nilai.publish');
         Route::get('/nilai/{nilai}/edit', [\App\Http\Controllers\Guru\NilaiController::class, 'edit'])->name('nilai.edit');
         Route::put('/nilai/{nilai}', [\App\Http\Controllers\Guru\NilaiController::class, 'update'])->name('nilai.update');
+
+        // Guru Profile CRUD
+        Route::get('/profile', [\App\Http\Controllers\Guru\ProfileController::class, 'index'])->name('profile');
+        Route::get('/profile/edit', [\App\Http\Controllers\Guru\ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/profile', [\App\Http\Controllers\Guru\ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [\App\Http\Controllers\Guru\ProfileController::class, 'destroy'])->name('profile.destroy');
     });
 
     // =======================
@@ -112,5 +119,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/jadwal', [\App\Http\Controllers\Murid\JadwalController::class, 'index'])->name('jadwal.index');
         Route::get('/nilai', [\App\Http\Controllers\Murid\NilaiController::class, 'index'])->name('nilai.index');
         Route::get('/pembayaran', [\App\Http\Controllers\Murid\PembayaranController::class, 'index'])->name('pembayaran.index');
+        Route::put('/pembayaran/{id}', [\App\Http\Controllers\Api\PembayaranApiController::class, 'update'])->name('pembayaran.update');
+
+        // Murid Profile CRUD
+        Route::get('/profile', [\App\Http\Controllers\Murid\ProfileController::class, 'index'])->name('profile');
+        Route::get('/profile/edit', [\App\Http\Controllers\Murid\ProfileController::class, 'edit'])->name('profile.edit');
+        Route::post('/profile', [\App\Http\Controllers\Murid\ProfileController::class, 'update'])->name('profile.update.post');
+        Route::delete('/profile', [\App\Http\Controllers\Murid\ProfileController::class, 'destroy'])->name('profile.destroy');
     });
 });

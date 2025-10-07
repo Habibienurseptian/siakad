@@ -34,6 +34,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'role' => 'admin',
         ]);
+
         Auth::login($user);
 
         return redirect('/dashboard')->with('success', 'Pendaftaran berhasil!');
@@ -47,19 +48,45 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required',
+            'login_id' => 'required|string',
+            'password' => 'required|string',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        $loginId = $request->login_id;
+        $password = $request->password;
+
+        $user = null;
+
+        // Cek apakah input berupa email → login admin
+        if (filter_var($loginId, FILTER_VALIDATE_EMAIL)) {
+            $user = \App\Models\User::where('email', $loginId)->first();
+        } else {
+            // Cek berdasarkan NIP (guru/staf)
+            $userGuru = \App\Models\Guru::where('nip', $loginId)->first();
+            $userStaf = \App\Models\Staf::where('nip', $loginId)->first();
+            $userMurid = \App\Models\Murid::where('nomor_induk', $loginId)->first();
+
+            if ($userGuru) {
+                $user = $userGuru->user;
+            } elseif ($userStaf) {
+                $user = $userStaf->user;
+            } elseif ($userMurid) {
+                $user = $userMurid->user;
+            }
+        }
+
+        if (!$user) {
+            return back()->withErrors(['login_id' => 'Akun tidak ditemukan.'])->withInput();
+        }
+
+        // Autentikasi menggunakan email (karena email tetap di tabel users)
+        if (Auth::attempt(['email' => $user->email, 'password' => $password])) {
             $request->session()->regenerate();
 
-            // Redirect sesuai role
-            $user = Auth::user();
             switch ($user->role) {
                 case 'admin':
                     return redirect()->route('admin.dashboard')->with('success', 'Login berhasil sebagai Admin!');
@@ -71,14 +98,13 @@ class AuthController extends Controller
                     return redirect()->route('murid.dashboard')->with('success', 'Login berhasil sebagai Murid!');
                 default:
                     Auth::logout();
-                    return redirect('/login')->withErrors(['email' => 'Role tidak valid.']);
+                    return redirect('/login')->withErrors(['login_id' => 'Role tidak valid.']);
             }
         }
 
-        return redirect()->back()->withErrors([
-            'email' => 'Email atau password salah.',
-        ])->withInput();
+        return back()->withErrors(['login_id' => 'Kata sandi salah.'])->withInput();
     }
+
 
     public function logout(Request $request)
     {

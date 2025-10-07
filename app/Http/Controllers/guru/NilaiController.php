@@ -12,17 +12,43 @@ class NilaiController extends Controller
     public function index(Request $request)
     {
         $guruNama = auth()->user()->name;
-        $mapelList = JadwalPelajaran::where('guru', $guruNama)->pluck('mapel')->unique();
-        $kelasList = JadwalPelajaran::where('guru', $guruNama)->pluck('kelas')->unique();
+        $jadwalGuru = JadwalPelajaran::where('guru', $guruNama)->get();
+        $mapelList = collect();
+        if ($request->kelas) {
+            $mapelList = $jadwalGuru->where('kelas', $request->kelas)->pluck('mapel')->unique();
+        } else {
+            $mapelList = $jadwalGuru->pluck('mapel')->unique();
+        }
+        // Kelas yang benar-benar diajar mapel tertentu oleh guru
+        $kelasList = collect();
+        if ($request->mapel) {
+            $kelasList = $jadwalGuru->where('mapel', $request->mapel)->pluck('kelas')->unique();
+        } else {
+            $kelasList = $jadwalGuru->pluck('kelas')->unique();
+        }
         $muridList = collect();
         $muridSudahDinilai = collect();
         $mapelSelected = $request->mapel;
         $kelasSelected = $request->kelas;
+        $nilaiDraft = collect();
+        $hasUngraded = false; // Ensure initialization outside the conditional block
         if ($mapelSelected && $kelasSelected) {
             $muridList = Murid::where('kelas', $kelasSelected)->get();
-            $muridSudahDinilai = \App\Models\Nilai::where('mapel', $mapelSelected)->where('kelas', $kelasSelected)->get();
+            $muridSudahDinilai = Nilai::where('mapel', $mapelSelected)->where('kelas', $kelasSelected)->get();
+            $nilaiDraft = Nilai::where('mapel', $mapelSelected)
+                ->where('kelas', $kelasSelected)
+                ->where('status', 'draft')
+                ->get();
+
+            $muridList = $muridList->map(function ($murid) use ($muridSudahDinilai, &$hasUngraded) {
+                $murid->sudahDinilai = $muridSudahDinilai->where('murid_id', $murid->id)->first();
+                if (!$murid->sudahDinilai) {
+                    $hasUngraded = true;
+                }
+                return $murid;
+            });
         }
-        return view('guru.nilai.index', compact('mapelList', 'kelasList', 'muridList', 'muridSudahDinilai', 'mapelSelected', 'kelasSelected'));
+        return view('guru.nilai.index', compact('mapelList', 'kelasList', 'muridList', 'muridSudahDinilai', 'mapelSelected', 'kelasSelected', 'nilaiDraft', 'hasUngraded'));
     }
 
     public function store(Request $request)

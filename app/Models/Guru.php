@@ -15,6 +15,19 @@ class Guru extends Model
         'user_id',
         'nip',
         'sekolah_id',
+        'name',
+        'email',
+        'phone',
+        'profile_image',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'warga_negara',
+        'alamat',
+        'kode_pos',
+        'tempat_lahir_orangtua',
+        'tanggal_lahir_orangtua',
+        'status_marital',
+        'nama_orangtua',
     ];
 
     public function user()

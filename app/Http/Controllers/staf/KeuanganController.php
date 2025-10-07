@@ -33,7 +33,18 @@ class KeuanganController extends Controller
                 ->orderBy('tanggal', 'desc')
                 ->get();
         }
-        $pemasukan = $pemasukanManual->concat($pemasukanTagihan);
+        // Gabungkan dan urutkan semua pemasukan berdasarkan tanggal
+        $pemasukan = $pemasukanManual->map(function($item) {
+            $item->__tanggal_sort = $item->tanggal;
+            return $item;
+        })->concat(
+            $pemasukanTagihan->map(function($item) {
+                $item->__tanggal_sort = $item->updated_at;
+                return $item;
+            })
+        )->sortByDesc(function($item) {
+            return $item->__tanggal_sort;
+        })->values();
         $totalPemasukan = $pemasukan->sum(function($item) {
             if (isset($item->jumlah)) {
                 return $item->jumlah;

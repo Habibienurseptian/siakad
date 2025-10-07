@@ -12,7 +12,7 @@
                 <i class="fa-solid fa-pen-to-square text-white text-xl sm:text-2xl"></i>
             </div>
             <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 px-4">Input Nilai Siswa</h1>
-            <p class="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto px-4">Silakan pilih mata pelajaran dan kelas untuk memasukkan nilai siswa dengan mudah dan efisien</p>
+            <p class="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto px-4">Silakan pilih mata pelajaran dan kelas untuk memasukkan nilai siswa</p>
         </div>
 
         <!-- Filter Section -->
@@ -112,13 +112,8 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        @php $hasUngraded = false; @endphp
                         @foreach($muridList as $index => $murid)
-                            @php 
-                                $sudahDinilai = $muridSudahDinilai->where('murid_id', $murid->id)->first();
-                            @endphp
-                            @if(!$sudahDinilai)
-                                @php $hasUngraded = true; @endphp
+                            @if(!$murid->sudahDinilai)
                                 <tr class="hover:bg-green-50 transition-all duration-200 {{ $index % 2 == 0 ? 'bg-white' : 'bg-gray-50' }}">
                                     <td class="px-3 sm:px-6 py-3 sm:py-4 text-center">
                                         <div class="inline-flex items-center gap-1 sm:gap-2 bg-blue-100 px-2 sm:px-3 py-1 sm:py-2 rounded-lg">
@@ -135,40 +130,19 @@
                                         </div>
                                     </td>
                                     <td class="px-3 sm:px-6 py-3 sm:py-4 text-center">
-                                        <div class="flex justify-center">
-                                            <div class="relative">
-                                                <input type="number" name="nilai_tugas[{{ $murid->id }}]" min="0" max="100" 
-                                                       class="w-16 sm:w-20 lg:w-24 text-center rounded-lg border-2 border-orange-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 py-1 sm:py-2 px-1 sm:px-3 font-semibold text-orange-800 text-xs sm:text-sm"
-                                                       placeholder="0">
-                                                <div class="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 w-3 h-3 sm:w-4 sm:h-4 bg-orange-500 rounded-full flex items-center justify-center">
-                                                    <i class="fa-solid fa-pencil text-white text-[8px] sm:text-xs"></i>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <input type="number" name="nilai_tugas[{{ $murid->id }}]" min="0" max="100" 
+                                               class="w-16 sm:w-20 lg:w-24 text-center rounded-lg border-2 border-orange-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 py-1 sm:py-2 px-1 sm:px-3 font-semibold text-orange-800 text-xs sm:text-sm"
+                                               placeholder="0">
                                     </td>
                                     <td class="px-3 sm:px-6 py-3 sm:py-4 text-center">
-                                        <div class="flex justify-center">
-                                            <div class="relative">
-                                                <input type="number" name="nilai_uts[{{ $murid->id }}]" min="0" max="100" 
-                                                       class="w-16 sm:w-20 lg:w-24 text-center rounded-lg border-2 border-yellow-200 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 py-1 sm:py-2 px-1 sm:px-3 font-semibold text-yellow-800 text-xs sm:text-sm"
-                                                       placeholder="0">
-                                                <div class="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 w-3 h-3 sm:w-4 sm:h-4 bg-yellow-500 rounded-full flex items-center justify-center">
-                                                    <i class="fa-solid fa-pencil text-white text-[8px] sm:text-xs"></i>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <input type="number" name="nilai_uts[{{ $murid->id }}]" min="0" max="100" 
+                                               class="w-16 sm:w-20 lg:w-24 text-center rounded-lg border-2 border-yellow-200 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 py-1 sm:py-2 px-1 sm:px-3 font-semibold text-yellow-800 text-xs sm:text-sm"
+                                               placeholder="0">
                                     </td>
                                     <td class="px-3 sm:px-6 py-3 sm:py-4 text-center">
-                                        <div class="flex justify-center">
-                                            <div class="relative">
-                                                <input type="number" name="nilai_uas[{{ $murid->id }}]" min="0" max="100" 
-                                                       class="w-16 sm:w-20 lg:w-24 text-center rounded-lg border-2 border-red-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 py-1 sm:py-2 px-1 sm:px-3 font-semibold text-red-800 text-xs sm:text-sm"
-                                                       placeholder="0">
-                                                <div class="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 w-3 h-3 sm:w-4 sm:h-4 bg-red-500 rounded-full flex items-center justify-center">
-                                                    <i class="fa-solid fa-pencil text-white text-[8px] sm:text-xs"></i>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <input type="number" name="nilai_uas[{{ $murid->id }}]" min="0" max="100" 
+                                               class="w-16 sm:w-20 lg:w-24 text-center rounded-lg border-2 border-red-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 py-1 sm:py-2 px-1 sm:px-3 font-semibold text-red-800 text-xs sm:text-sm"
+                                               placeholder="0">
                                     </td>
                                 </tr>
                             @endif
@@ -204,9 +178,6 @@
         </form>
 
         <!-- Publish Section -->
-        @php
-            $nilaiDraft = $muridSudahDinilai->where('status', 'draft');
-        @endphp
         @if($nilaiDraft->count() > 0)
         <div class="bg-white rounded-2xl shadow-lg border border-blue-100 p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

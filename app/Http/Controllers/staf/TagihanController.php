@@ -28,58 +28,34 @@ class TagihanController extends Controller
                     // Filter murid sesuai status
                     if ($filterStatus === 'lunas') {
                         $muridsAll = $muridsAll->filter(function($murid) {
-                            return $murid->tagihans->where('status', 'lunas')->count() > 0;
+                            // Semua tagihan lunas (ada tagihan dan tidak ada yang belum lunas)
+                            return $murid->tagihans->count() > 0 && $murid->tagihans->where('status', '!=', 'lunas')->count() == 0;
                         })->values();
                     } elseif ($filterStatus === 'belum_lunas') {
                         $muridsAll = $muridsAll->filter(function($murid) {
-                            return $murid->tagihans->where('status', '!=', 'lunas')->count() > 0;
+                            // Ada tagihan dan minimal satu belum lunas
+                            return $murid->tagihans->count() > 0 && $murid->tagihans->where('status', '!=', 'lunas')->count() > 0;
                         })->values();
                     } elseif ($filterStatus === 'belum_ada_tagihan') {
                         $muridsAll = $muridsAll->filter(function($murid) {
                             return $murid->tagihans->count() == 0;
                         })->values();
                     }
+
+                    // Filter berdasarkan pencarian (nama atau nomor induk)
+                    $search = request('search');
+                    if (!empty($search)) {
+                        $muridsAll = $muridsAll->filter(function($murid) use ($search) {
+                            $nama = strtolower($murid->user->name ?? '');
+                            $nomor = strtolower($murid->nomor_induk ?? '');
+                            $search = strtolower($search);
+                            return str_contains($nama, $search) || str_contains($nomor, $search);
+                        })->values();
+                    }
+
                     // Hitung total tagihan per murid
                     foreach ($muridsAll as $murid) {
-                        if ($filterStatus === 'lunas') {
-                            $murid->totalTagihan = $murid->tagihans
-                                ->where('status', 'lunas')
-                                ->sum(function($tagihan) {
-                                    return (float) ($tagihan->jumlah ?? 0)
-                                        + (float) ($tagihan->pembayaran_spp ?? 0)
-                                        + (float) ($tagihan->uang_saku ?? 0)
-                                        + (float) ($tagihan->uang_kegiatan ?? 0)
-                                        + (float) ($tagihan->uang_spi ?? 0)
-                                        + (float) ($tagihan->uang_haul_maulid ?? 0)
-                                        + (float) ($tagihan->uang_khidmah_infaq ?? 0)
-                                        + (float) ($tagihan->uang_zakat ?? 0);
-                                });
-                        } elseif ($filterStatus === 'belum_lunas') {
-                            $murid->totalTagihan = $murid->tagihans
-                                ->where('status', '!=', 'lunas')
-                                ->sum(function($tagihan) {
-                                    return (float) ($tagihan->jumlah ?? 0)
-                                        + (float) ($tagihan->pembayaran_spp ?? 0)
-                                        + (float) ($tagihan->uang_saku ?? 0)
-                                        + (float) ($tagihan->uang_kegiatan ?? 0)
-                                        + (float) ($tagihan->uang_spi ?? 0)
-                                        + (float) ($tagihan->uang_haul_maulid ?? 0)
-                                        + (float) ($tagihan->uang_khidmah_infaq ?? 0)
-                                        + (float) ($tagihan->uang_zakat ?? 0);
-                                });
-                        } else {
-                            $murid->totalTagihan = $murid->tagihans
-                                ->sum(function($tagihan) {
-                                    return (float) ($tagihan->jumlah ?? 0)
-                                        + (float) ($tagihan->pembayaran_spp ?? 0)
-                                        + (float) ($tagihan->uang_saku ?? 0)
-                                        + (float) ($tagihan->uang_kegiatan ?? 0)
-                                        + (float) ($tagihan->uang_spi ?? 0)
-                                        + (float) ($tagihan->uang_haul_maulid ?? 0)
-                                        + (float) ($tagihan->uang_khidmah_infaq ?? 0)
-                                        + (float) ($tagihan->uang_zakat ?? 0);
-                                });
-                        }
+                        $murid->totalUnpaidTagihan = $murid->getTotalUnpaidTagihan();
                     }
                     $muridsByKelas[$kelas] = $muridsAll;
                 }

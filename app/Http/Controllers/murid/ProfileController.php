@@ -1,0 +1,71 @@
+<?php
+namespace App\Http\Controllers\Murid;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Murid;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
+class ProfileController extends Controller
+{
+    public function index()
+    {
+        $murid = Murid::where('user_id', auth()->id())->first();
+        return view('murid.profile.index', compact('murid'));
+    }
+
+    public function destroy()
+    {
+        $murid = Murid::where('user_id', Auth::id())->first();
+        if ($murid->profile_image) {
+            Storage::disk('public')->delete($murid->profile_image);
+        }
+        $murid->delete();
+        return redirect('/')->with('success', 'Profil berhasil dihapus!');
+    }
+
+    public function edit()
+    {
+        $murid = \App\Models\Murid::where('user_id', auth()->id())->first();
+        return view('murid.profile.edit', compact('murid'));
+    }
+
+    // Untuk handle POST dan PUT update profile
+    public function update(Request $request)
+    {
+        $murid = Murid::where('user_id', auth()->id())->first();
+        $request->validate([
+            'phone' => 'nullable|integer|max:14',
+            'nama_orangtua' => 'nullable|string|max:255',
+            'telepon_orangtua' => 'nullable|integer|max:14',
+            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+        $murid->fill([
+            'phone' => $request->phone,
+            'nama_orangtua' => $request->nama_orangtua,
+            'telepon_orangtua' => $request->telepon_orangtua,
+            'tempat_lahir' => $request->tempat_lahir,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'warga_negara' => $request->warga_negara,
+            'alamat' => $request->alamat,
+            'kode_pos' => $request->kode_pos,
+            'tempat_lahir_orangtua' => $request->tempat_lahir_orangtua,
+            'tanggal_lahir_orangtua' => $request->tanggal_lahir_orangtua,
+        ]);
+        if ($request->hasFile('profile_image')) {
+            // Pastikan folder profile_image ada
+            if (!\Storage::disk('public')->exists('profile_image')) {
+                \Storage::disk('public')->makeDirectory('profile_image');
+            }
+            // Hapus gambar lama jika ada
+            if ($murid->profile_image) {
+                \Storage::disk('public')->delete($murid->profile_image);
+            }
+            $path = $request->file('profile_image')->store('profile_image', 'public');
+            $murid->profile_image = $path;
+        }
+        $murid->save();
+        return redirect()->route('murid.profile')->with('success', 'Profil berhasil diperbarui!');
+    }
+}
