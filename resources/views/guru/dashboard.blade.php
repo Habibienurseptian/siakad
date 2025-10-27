@@ -30,64 +30,39 @@
         </p>
     </div>
 
-    <!-- Jadwal Mengajar -->
+    {{-- JADWAL PELAJARAN --}}
     <div class="bg-gray-100 shadow-md rounded-lg p-6 mt-6">
         <h2 class="md:text-2xl text-xl font-semibold text-gray-900 flex items-center">
             <span class="icon-card mr-3">
-                <i class="fas fa-calendar-alt text-white text-lg"></i>
+                <i class="fas fa-calendar-alt text-white text-xl"></i>
             </span>
-            Jadwal Mengajar Hari {{ $hariNow }}
+            Jadwal Pelajaran Hari {{ $hariNow }}
         </h2>
         <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pb-4">
             @forelse($jadwalHariIni as $jadwal)
-                <div class="relative p-5 bg-white rounded-2xl shadow-lg flex flex-col justify-between min-h-[160px]">
-                    <!-- Header Card -->
+                <div class="relative p-5 bg-white rounded-2xl shadow-lg hover:shadow-xl transition duration-200 flex flex-col justify-between min-h-[160px]">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center space-x-2">
-                            @if(strtolower(trim($jadwal->mapel)) == 'istirahat')
-                                <div class="p-2 rounded-full bg-blue-100 text-blue-600">
-                                    <i class="fas fa-utensils"></i>
-                                </div>
-                                <span class="font-semibold text-blue-600 text-lg">Istirahat</span>
-                            @else
                                 <div class="p-2 rounded-full bg-green-100 text-green-600">
                                     <i class="fas fa-book-open"></i>
                                 </div>
                                 <span class="font-semibold text-gray-800 text-lg">{{ $jadwal->mapel }}</span>
-                            @endif
                         </div>
                         <span class="text-sm text-gray-500 flex items-center">
-                            <i class="far fa-clock mr-1 text-gray-400"></i>
-                            @php
-                                try {
-                                    $jamMulai = \Carbon\Carbon::createFromFormat('H:i:s', $jadwal->jam_mulai)->format('H:i');
-                                    $jamSelesai = \Carbon\Carbon::createFromFormat('H:i:s', $jadwal->jam_selesai)->format('H:i');
-                                } catch (Exception $e) {
-                                    $jamMulai = $jadwal->jam_mulai;
-                                    $jamSelesai = $jadwal->jam_selesai;
-                                }
-                            @endphp
-                            {{ $jamMulai }} - {{ $jamSelesai }}
+                            <i class="far fa-clock mr-1"></i>
+                            {{ \Carbon\Carbon::parse($jadwal->jam_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($jadwal->jam_selesai)->format('H:i') }}
                         </span>
                     </div>
-
-                    <!-- Body Card -->
                     <div>
-                        @if(strtolower(trim($jadwal->mapel)) == 'istirahat')
-                            <p class="text-gray-600 flex items-center text-sm">
-                                🍽️ Waktu untuk makan dan istirahat
-                            </p>
-                        @else
-                            <p class="text-gray-700 font-medium">Kelas {{ $jadwal->kelas ?? '-' }}</p>
+                            <p class="text-gray-700 font-medium">Kelas {{ strtoupper($jadwal->kelas->nama_kelas ?? '-') }}</p>
                             <p class="text-gray-500 text-sm flex items-center mt-1">
                                 <i class="fas fa-user-tie mr-1 text-gray-400"></i>
                                 {{ $jadwal->guru }}
                             </p>
-                        @endif
                     </div>
                 </div>
             @empty
-                <div class="p-5 bg-gray-50 rounded-md text-gray-400">Tidak ada jadwal mengajar hari ini.</div>
+                <div class="p-5 bg-gray-50 rounded-md text-gray-400">Tidak ada jadwal pelajaran hari ini.</div>
             @endforelse
         </div>
     </div>

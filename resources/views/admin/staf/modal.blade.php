@@ -30,6 +30,12 @@
                     <input type="text" name="nip" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
                 </div>
 
+                <!-- Bidang -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Bidang (opsional)</label>
+                    <input type="text" name="bidang" placeholder="Contoh: keuangan / akademik" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
                 <!-- Password -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>

@@ -304,13 +304,10 @@
     </div>
 </div>
 
-<!-- Modal Tambah Data -->
 @include('staf.keuangan.create')
 
-<!-- Modal Edit Data (pastikan di luar loop, agar selalu ada di halaman) -->
 @include('staf.keuangan.edit')
 
-<!-- Script Modal & Edit -->
 <script>
     function openModal() {
         document.getElementById('keuanganModal').classList.remove('hidden');
@@ -332,7 +329,6 @@
         document.getElementById('editKeuanganModal').classList.add('hidden');
     }
 
-    // Auto hide success/error messages
     document.addEventListener('DOMContentLoaded', function() {
         const alerts = document.querySelectorAll('.alert-auto-hide');
         alerts.forEach(alert => {

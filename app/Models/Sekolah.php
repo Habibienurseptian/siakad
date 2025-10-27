@@ -37,4 +37,8 @@ class Sekolah extends Model
     {
         return $this->hasMany(JadwalPelajaran::class, 'sekolah_id');
     }
+    public function kelas()
+    {
+        return $this->hasMany(Kelas::class, 'sekolah_id');
+    }
 }

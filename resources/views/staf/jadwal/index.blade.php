@@ -48,8 +48,7 @@
                                 </div>
                             </div>
                             <button onclick="document.getElementById('modalTambahJadwal').classList.remove('hidden'); 
-                                           document.querySelector('#modalTambahJadwal input[name=sekolah_id]').value = '{{ $sekolah->id }}'; 
-                                           document.querySelector('#modalTambahJadwal input[readonly]').value = '{{ $sekolah->nama }}';"
+                                           document.querySelector('#modalTambahJadwal input[name=sekolah_id]').value = '{{ $sekolah->id }}';"
                                     class="inline-flex items-center justify-center px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-medium rounded-lg backdrop-blur-sm transition-all duration-200 hover:scale-105">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -71,7 +70,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                                         </svg>
                                     </div>
-                                    <h3 class="text-xl font-bold text-gray-900">Kelas {{ $kelas }}</h3>
+                                    <h3 class="text-xl font-bold text-gray-900">Kelas {{ strtoupper($kelas) }}</h3>
                                 </div>
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
                                     {{ count($jadwalByHari) }} Hari
@@ -152,11 +151,11 @@
                                                         <div class="flex items-center">
                                                             <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
                                                                 <span class="text-purple-600 font-medium text-sm">
-                                                                    {{ substr($item->mapel, 0, 2) }}
+                                                                    {{ strtoupper(substr($item->mapel, 0, 2)) }}
                                                                 </span>
                                                             </div>
                                                             <div>
-                                                                <div class="text-sm font-medium text-gray-900">{{ $item->mapel }}</div>
+                                                                <div class="text-sm font-medium text-gray-900">{{ strtoupper($item->mapel) }}</div>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -164,7 +163,7 @@
                                                         <div class="flex items-center">
                                                             <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
                                                                 <span class="text-green-600 font-medium text-xs">
-                                                                    {{ substr($item->guru, 0, 1) }}
+                                                                    {{ strtoupper(substr($item->guru, 0, 1)) }}
                                                                 </span>
                                                             </div>
                                                             <span class="text-sm text-gray-900">{{ $item->guru }}</span>
@@ -172,13 +171,23 @@
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
                                                         <div class="flex items-center gap-2">
-                                                            <a href="{{ route('staf.jadwal.edit', $item->id) }}" 
-                                                               class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-700 transition-colors" 
-                                                               title="Edit">
+                                                            <button type="button"
+                                                                    onclick='openEditModal({
+                                                                        id: {{ $item->id }},
+                                                                        sekolah_id: {{ $item->sekolah_id }},
+                                                                        hari: "{{ $item->hari }}",
+                                                                        guru: "{{ $item->guru }}",
+                                                                        kelas_id: {{ $item->kelas_id }},
+                                                                        jam_mulai: "{{ $item->jam_mulai }}",
+                                                                        jam_selesai: "{{ $item->jam_selesai }}",
+                                                                        mapel: "{{ $item->mapel }}"
+                                                                    })'
+                                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-700 transition-colors" 
+                                                                    title="Edit">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                                                 </svg>
-                                                            </a>
+                                                            </button>
                                                             <form action="{{ route('staf.jadwal.destroy', $item->id) }}" method="POST" 
                                                                   onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')" 
                                                                   class="inline">
@@ -224,8 +233,11 @@
     </div>
 </div>
 
-
+<!-- Include Modal Tambah -->
 @include('staf.jadwal.create', ['gurus' => $gurus])
+
+<!-- Include Modal Edit -->
+@include('staf.jadwal.edit', ['gurus' => $gurus])
 
 <!-- Loading Animation -->
 <style>

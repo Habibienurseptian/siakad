@@ -8,7 +8,7 @@ return new class extends Migration {
         Schema::create('nilai', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('murid_id');
-            $table->string('kelas');
+            $table->unsignedBigInteger('kelas_id');
             $table->string('mapel');
             $table->unsignedBigInteger('jadwal_id');
             $table->integer('nilai');

@@ -32,6 +32,7 @@ class StafController extends Controller
             'password' => 'required|string|min:6',
             'nip' => 'required|string|unique:stafs,nip',
             'sekolah_id' => 'required|exists:sekolahs,id',
+            'bidang' => 'nullable|string|max:100',
         ], [
             'nip.unique' => 'Nomor Induk Pegawai (NIP) sudah digunakan. Harap gunakan NIP lain.',
             'email.unique' => 'Email sudah terdaftar, silakan gunakan email lain.',
@@ -46,6 +47,7 @@ class StafController extends Controller
             'user_id' => $user->id,
             'nip' => $request->nip,
             'sekolah_id' => $request->sekolah_id,
+            'bidang' => $request->bidang,
         ]);
         return redirect()->route('admin.staf.index')->with('success', 'Data staf berhasil ditambahkan!');
     }
@@ -53,7 +55,8 @@ class StafController extends Controller
     public function show($id)
     {
         $staf = Staf::with(['user', 'sekolah'])->findOrFail($id);
-        return view('admin.staf.show', compact('staf'));
+        $sekolahs = Sekolah::orderBy('nama')->get();
+        return view('admin.staf.show', compact('staf', 'sekolahs'));
     }
 
     public function edit($id)
@@ -71,6 +74,7 @@ class StafController extends Controller
             'email' => 'required|email|unique:users,email,' . $staf->user->id,
             'nip' => 'required|string|unique:stafs,nip,' . $staf->id,
             'sekolah_id' => 'required|exists:sekolahs,id',
+            'bidang' => 'nullable|string|max:100',
         ], [
             'nip.unique' => 'Nomor Induk Pegawai (NIP) sudah digunakan. Harap gunakan NIP lain.',
             'email.unique' => 'Email sudah terdaftar, silakan gunakan email lain.',
@@ -83,6 +87,7 @@ class StafController extends Controller
         $staf->update([
             'nip' => $request->nip,
             'sekolah_id' => $request->sekolah_id,
+            'bidang' => $request->bidang,
         ]);
         return redirect()->route('admin.staf.index')->with('success', 'Data staf berhasil diupdate!');
     }

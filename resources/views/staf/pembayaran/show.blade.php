@@ -90,7 +90,7 @@
                                 </div>
                                 <span class="text-sm font-medium text-gray-500">Kelas</span>
                             </div>
-                            <span class="block text-lg font-bold text-gray-900">{{ $murid->kelas }}</span>
+                            <span class="block text-lg font-bold text-gray-900">{{ strtoupper($murid->kelas->nama_kelas ?? '-') }}</span>
                         </div>
                     </div>
                 </div>

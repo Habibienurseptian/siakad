@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use \App\Models\Guru;
+use \App\Models\Staf;
+use \App\Models\Murid;
 
 class AuthController extends Controller
 {
@@ -58,24 +61,28 @@ class AuthController extends Controller
 
         $loginId = $request->login_id;
         $password = $request->password;
-
         $user = null;
 
-        // Cek apakah input berupa email → login admin
+        // === LOGIN ADMIN DENGAN EMAIL ===
         if (filter_var($loginId, FILTER_VALIDATE_EMAIL)) {
-            $user = \App\Models\User::where('email', $loginId)->first();
-        } else {
-            // Cek berdasarkan NIP (guru/staf)
-            $userGuru = \App\Models\Guru::where('nip', $loginId)->first();
-            $userStaf = \App\Models\Staf::where('nip', $loginId)->first();
-            $userMurid = \App\Models\Murid::where('nomor_induk', $loginId)->first();
+            $user = User::where('email', $loginId)->where('role', 'admin')->first();
 
-            if ($userGuru) {
-                $user = $userGuru->user;
-            } elseif ($userStaf) {
-                $user = $userStaf->user;
-            } elseif ($userMurid) {
-                $user = $userMurid->user;
+            if (!$user) {
+                return back()->withErrors(['login_id' => 'Hanya admin yang dapat login dengan email.'])->withInput();
+            }
+        } 
+        // === LOGIN NON-ADMIN DENGAN NOMOR INDUK ===
+        else {
+            $guru = Guru::where('nip', $loginId)->first();
+            $staf = Staf::where('nip', $loginId)->first();
+            $murid = Murid::where('nomor_induk', $loginId)->first();
+
+            if ($guru) {
+                $user = $guru->user;
+            } elseif ($staf) {
+                $user = $staf->user;
+            } elseif ($murid) {
+                $user = $murid->user;
             }
         }
 
@@ -83,7 +90,7 @@ class AuthController extends Controller
             return back()->withErrors(['login_id' => 'Akun tidak ditemukan.'])->withInput();
         }
 
-        // Autentikasi menggunakan email (karena email tetap di tabel users)
+        // Autentikasi (tetap menggunakan email dari tabel users)
         if (Auth::attempt(['email' => $user->email, 'password' => $password])) {
             $request->session()->regenerate();
 
@@ -104,7 +111,6 @@ class AuthController extends Controller
 
         return back()->withErrors(['login_id' => 'Kata sandi salah.'])->withInput();
     }
-
 
     public function logout(Request $request)
     {

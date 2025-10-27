@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
-    <div class="container mx-auto max-w-4xl px-4 py-8">
+    <div class="container mx-auto max-w-6xl px-4 py-8">
         
         <!-- Header Section -->
         <div class="text-center mb-10">

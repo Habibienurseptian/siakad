@@ -1,59 +1,73 @@
-@extends('layouts.app')
+<!-- Modal Edit Staf -->
+<div id="modalEditStaf-{{ $staf->id }}" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg overflow-hidden">
+        <!-- Header -->
+        <div class="flex justify-between items-center px-6 py-4 border-b">
+            <h2 class="text-lg font-bold text-gray-800">Edit Data Staf - {{ $staf->user->name }}</h2>
+        </div>
 
-@section('title', 'Edit Staf')
+        <!-- Body -->
+        <div class="px-6">
+            <form action="{{ route('admin.staf.update', $staf->id) }}" method="POST" id="formEditStaf-{{ $staf->id }}" class="space-y-4">
+                @csrf
+                @method('PUT')
 
-@section('content')
-<div class="container mx-auto max-w-lg px-4 py-8">
-    <div class="border-t-4 border-green-500 rounded-xl shadow p-8">
-        <h1 class="text-2xl font-bold text-green-800 mb-6">Edit Staf</h1>
-
-         @if(session('success'))
-            <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        <!-- Notifikasi Error -->
-        @if($errors->any())
-            <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                <strong>Terjadi kesalahan:</strong>
-                <ul class="list-disc list-inside">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <form action="{{ route('admin.staf.update', $staf->id) }}" method="POST" class="space-y-4">
-            @csrf
-            @method('PUT')
-            <div>
+                <!-- Nama -->
+                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
-                    <input type="text" name="name" value="{{ $staf->user->name }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email" name="email" value="{{ $staf->user->email }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" required>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
-                <input type="text" name="nip" value="{{ $staf->nip }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" required>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Sekolah</label>
-                <select name="sekolah_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg" required>
-                    <option value="">-- Pilih Sekolah --</option>
-                    @foreach($sekolahs as $sekolah)
-                        <option value="{{ $sekolah->id }}" @if($staf->sekolah_id == $sekolah->id) selected @endif>{{ $sekolah->nama }}</option>
-                    @endforeach
-                </select>
-            </div>
-                <div class="flex justify-end gap-2 mt-6">
-                    <a href="{{ route('admin.staf.index') }}" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition">Batal</a>
-                    <button type="submit" class="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 shadow transition">Simpan Perubahan</button>
+                    <input type="text" name="name" value="{{ $staf->user->name }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required>
                 </div>
-        </form>
+
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" name="email" value="{{ $staf->user->email }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required>
+                </div>
+
+                <!-- NIP -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
+                    <input type="text" name="nip" value="{{ $staf->nip }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required>
+                </div>
+
+                <!-- Sekolah -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Sekolah</label>
+                    <select name="sekolah_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required>
+                        <option value="">-- Pilih Sekolah --</option>
+                        @foreach($sekolahs as $sekolah)
+                            <option value="{{ $sekolah->id }}" @if($staf->sekolah_id == $sekolah->id) selected @endif>
+                                {{ $sekolah->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Bidang -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Bidang (opsional)</label>
+                    <input type="text" name="bidang" value="{{ $staf->bidang ?? '' }}" placeholder="Contoh: keuangan / akademik" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+                </div>
+
+                <!-- Password Baru (opsional) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password Baru (opsional)</label>
+                    <input type="password" name="password" placeholder="Kosongkan jika tidak ingin mengganti password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+                </div>
+
+                <!-- Footer -->
+                <div class="flex justify-end gap-3 px-6 py-4 border-t">
+                    <button type="button" 
+                            onclick="document.getElementById('modalEditStaf-{{ $staf->id }}').classList.add('hidden')" 
+                            class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium rounded-lg shadow">
+                        Batal
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-@endsection

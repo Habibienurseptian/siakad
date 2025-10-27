@@ -9,13 +9,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('gurus', function (Blueprint $table) {
+            $table->string('profile_image')->nullable();
             $table->string('tempat_lahir')->nullable();
             $table->date('tanggal_lahir')->nullable();
             $table->string('warga_negara')->nullable();
             $table->string('alamat')->nullable();
             $table->string('kode_pos')->nullable();
+            $table->string('phone')->nullable();
             $table->string('tempat_lahir_orangtua')->nullable();
             $table->date('tanggal_lahir_orangtua')->nullable();
+            $table->string('nama_orangtua')->nullable();
             $table->enum('status_marital', ['menikah', 'belum menikah', 'cerai'])->nullable();
         });
     }

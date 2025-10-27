@@ -33,7 +33,7 @@
                     <select name="mapel" id="mapel" class="w-full rounded-xl border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 py-3 px-4 text-gray-700 text-sm sm:text-base" onchange="this.form.submit()">
                         <option value="">-- Pilih Mata Pelajaran --</option>
                         @foreach($mapelList as $mapel)
-                            <option value="{{ $mapel }}" {{ request('mapel') == $mapel ? 'selected' : '' }}>{{ $mapel }}</option>
+                            <option value="{{ $mapel }}" {{ request('mapel') == $mapel ? 'selected' : '' }}>{{ strtoupper($mapel) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -43,10 +43,12 @@
                         <i class="fa-solid fa-graduation-cap text-purple-600"></i>
                         Kelas
                     </label>
-                    <select name="kelas" id="kelas" class="w-full rounded-xl border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 py-3 px-4 text-gray-700 text-sm sm:text-base" onchange="this.form.submit()">
+                    <select name="kelas_id" id="kelas" class="w-full rounded-xl border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 py-3 px-4 text-gray-700 text-sm sm:text-base" onchange="this.form.submit()">
                         <option value="">-- Pilih Kelas --</option>
                         @foreach($kelasList as $kelas)
-                            <option value="{{ $kelas }}" {{ request('kelas') == $kelas ? 'selected' : '' }}>{{ $kelas }}</option>
+                            <option value="{{ $kelas->id }}" {{ request('kelas_id') == $kelas->id ? 'selected' : '' }}>
+                                {{ strtoupper($kelas->nama_kelas) }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -58,7 +60,7 @@
         <form action="{{ route('guru.nilai.store') }}" method="POST" class="bg-white rounded-2xl shadow-lg border border-green-100 overflow-hidden mb-6 sm:mb-8" id="form-nilai">
             @csrf
             <input type="hidden" name="mapel" value="{{ $mapelSelected }}">
-            <input type="hidden" name="kelas" value="{{ $kelasSelected }}">
+            <input type="hidden" name="kelas_id" value="{{ $kelasIdSelected }}">
 
             <!-- Form Header -->
             <div class="bg-gradient-to-r from-green-500 to-emerald-600 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -69,7 +71,9 @@
                         </div>
                         <div>
                             <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-white">Daftar Siswa</h2>
-                            <p class="text-green-100 text-sm sm:text-base">Kelas {{ $kelasSelected }} - {{ $mapelSelected }}</p>
+                            <p class="text-green-100 text-sm sm:text-base">
+                                Kelas {{ $kelasSelected ? strtoupper($kelasSelected->nama_kelas) : '-' }} - {{ $mapelSelected }}
+                            </p>
                         </div>
                     </div>
                     <div class="bg-white bg-opacity-20 px-3 sm:px-4 py-2 rounded-lg self-start sm:self-auto">
@@ -193,7 +197,7 @@
                 <form action="{{ route('guru.nilai.publish') }}" method="POST" class="w-full sm:w-auto">
                     @csrf
                     <input type="hidden" name="mapel" value="{{ $mapelSelected }}">
-                    <input type="hidden" name="kelas" value="{{ $kelasSelected }}">
+                    <input type="hidden" name="kelas_id" value="{{ $kelasIdSelected }}">
                     <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 text-sm sm:text-base">
                         <i class="fa-solid fa-paper-plane"></i>
                         Publikasikan Nilai

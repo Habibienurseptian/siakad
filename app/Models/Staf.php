@@ -14,6 +14,7 @@ class Staf extends Model
         'user_id',
         'nip',
         'sekolah_id',
+        'bidang',
     ];
 
     public function user()
@@ -24,5 +25,9 @@ class Staf extends Model
     public function sekolah()
     {
         return $this->belongsTo(Sekolah::class, 'sekolah_id');
+    }
+    public function guru()
+    {
+        return $this->hasOne(Guru::class, 'nip', 'nip');
     }
 }

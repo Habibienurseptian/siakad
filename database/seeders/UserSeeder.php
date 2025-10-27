@@ -17,24 +17,6 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password123'),
                 'role' => 'admin',
             ],
-            [
-                'name' => 'Staf Sekolah',
-                'email' => 'staf@gmail.com',
-                'password' => Hash::make('password123'),
-                'role' => 'staf',
-            ],
-            [
-                'name' => 'Guru Matematika',
-                'email' => 'guru@gmail.com',
-                'password' => Hash::make('password123'),
-                'role' => 'guru',
-            ],
-            [
-                'name' => 'Siswa A',
-                'email' => 'siswa@gmail.com',
-                'password' => Hash::make('password123'),
-                'role' => 'murid',
-            ],
         ]);
     }
 }

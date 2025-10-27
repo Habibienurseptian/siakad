@@ -11,18 +11,35 @@ use Illuminate\Support\Facades\Hash;
 class GuruController extends Controller
 {
     // Tampilkan semua guru
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search', []); // Default to an empty array
         $sekolahs = Sekolah::all();
-            $gurus = [];
-            foreach ($sekolahs as $sekolah) {
-                $gurus[$sekolah->id] = Guru::with(['user', 'sekolah'])
-                    ->where('sekolah_id', $sekolah->id)
-                    ->orderBy('nip')
-                    ->orderBy(User::select('name')->whereColumn('users.id', 'gurus.user_id'))
-                    ->paginate(25, ['*'], 'page_guru_' . $sekolah->id);
+        $gurus = [];
+
+        foreach ($sekolahs as $sekolah) {
+            $query = Guru::with(['user', 'sekolah'])
+                ->where('sekolah_id', $sekolah->id);
+
+            if (!empty($search[$sekolah->id])) {
+                $query->where(function ($q) use ($search, $sekolah) {
+                    $q->where('nip', 'like', "%{$search[$sekolah->id]}%")
+                      ->orWhereHas('user', function ($q) use ($search, $sekolah) {
+                          $q->where('name', 'like', "%{$search[$sekolah->id]}%");
+                      });
+                });
             }
-            return view('admin.guru.index', compact('gurus', 'sekolahs'));
+
+            $gurus[$sekolah->id] = $query->orderBy('nip')
+                ->orderBy(User::select('name')->whereColumn('users.id', 'gurus.user_id'))
+                ->paginate(25, ['*'], 'page_guru_' . $sekolah->id);
+        }
+
+        return view('admin.guru.index', [
+            'gurus' => $gurus,
+            'sekolahs' => $sekolahs,
+            'search' => $search,
+        ]);
     }
 
     // Simpan guru baru
@@ -31,9 +48,10 @@ class GuruController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8',
             'nip' => 'required|string|unique:gurus,nip',
             'sekolah_id' => 'required|exists:sekolahs,id',
+            'phone' => 'nullable|string|max:25',
         ], [
             'nip.unique' => 'Nomor Induk Pegawai (NIP) sudah digunakan. Harap gunakan NIP lain.',
             'email.unique' => 'Email sudah terdaftar, silakan gunakan email lain.',
@@ -50,6 +68,7 @@ class GuruController extends Controller
             'user_id' => $user->id,
             'nip' => $request->nip,
             'sekolah_id' => $request->sekolah_id,
+            'phone' => $request->phone,
         ]);
 
         return redirect()->route('admin.guru.index')->with('success', 'Data guru berhasil ditambahkan!');
@@ -80,6 +99,8 @@ class GuruController extends Controller
             'email' => 'required|email|unique:users,email,' . $guru->user->id,
             'nip' => 'required|string|unique:gurus,nip,' . $guru->id,
             'sekolah_id' => 'required|exists:sekolahs,id',
+            'phone' => 'nullable|string|max:25',
+            'password' => 'nullable|string|min:8',
         ], [
             'nip.unique' => 'Nomor Induk Pegawai (NIP) sudah digunakan. Harap gunakan NIP lain.',
             'email.unique' => 'Email sudah terdaftar, silakan gunakan email lain.',
@@ -88,11 +109,13 @@ class GuruController extends Controller
         $guru->user->update([
             'name' => $request->name,
             'email' => $request->email,
+            'password' => $request->filled('password') ? Hash::make($request->password) : $guru->user->password,
         ]);
 
         $guru->update([
             'nip' => $request->nip,
             'sekolah_id' => $request->sekolah_id,
+            'phone' => $request->phone,
         ]);
 
         return redirect()->route('admin.guru.index')->with('success', 'Data guru berhasil diupdate!');

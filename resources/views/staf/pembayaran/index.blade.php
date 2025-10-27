@@ -77,7 +77,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                                         </svg>
                                     </div>
-                                    <h3 class="text-xl font-bold text-gray-900">Kelas {{ $kelas }}</h3>
+                                    <h3 class="text-xl font-bold text-gray-900">Kelas {{ strtoupper($kelas) }}</h3>
                                 </div>
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
                                     {{ count($murids) }} Siswa
@@ -101,9 +101,9 @@
                                                         id="status_{{ $sekolah->id }}_{{ $kelas }}" 
                                                         class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
                                                     <option value="">Semua Status</option>
-                                                    <option value="lunas" {{ request('status') == 'lunas' ? 'selected' : '' }}>✓ Lunas</option>
-                                                    <option value="belum_lunas" {{ request('status') == 'belum_lunas' ? 'selected' : '' }}>⚠ Belum Lunas</option>
-                                                    <option value="belum_ada_tagihan" {{ request('status') == 'belum_ada_tagihan' ? 'selected' : '' }}>○ Belum Ada Tagihan</option>
+                                                    <option value="lunas" {{ request('status') == 'lunas' ? 'selected' : '' }}>Lunas</option>
+                                                    <option value="belum_lunas" {{ request('status') == 'belum_lunas' ? 'selected' : '' }}>Belum Lunas</option>
+                                                    <option value="belum_ada_tagihan" {{ request('status') == 'belum_ada_tagihan' ? 'selected' : '' }}>Belum Ada Tagihan</option>
                                                 </select>
                                             </div>
                                         </div>

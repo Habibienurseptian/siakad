@@ -122,13 +122,13 @@
                                         <div class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                                             <i class="fa-solid fa-book text-blue-600 text-xs sm:text-sm"></i>
                                         </div>
-                                        <span class="font-semibold text-gray-800 text-xs sm:text-sm truncate">{{ $jadwal->mapel }}</span>
+                                        <span class="font-semibold text-gray-800 text-xs sm:text-sm truncate">{{ strtoupper($jadwal->mapel) }}</span>
                                     </div>
                                 </td>
                                 <td class="px-3 sm:px-6 py-3 sm:py-4 text-center">
                                     <div class="inline-flex items-center gap-1 sm:gap-2 bg-purple-100 px-2 sm:px-3 py-1 sm:py-2 rounded-lg">
                                         <i class="fa-solid fa-users text-purple-600 text-xs sm:text-sm"></i>
-                                        <span class="font-semibold text-purple-800 text-xs sm:text-sm">{{ $jadwal->kelas }}</span>
+                                        <span class="font-semibold text-purple-800 text-xs sm:text-sm">{{ strtoupper($jadwal->kelas->nama_kelas) }}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -225,13 +225,13 @@
                                         <div class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                                             <i class="fa-solid fa-book text-blue-600 text-xs sm:text-sm"></i>
                                         </div>
-                                        <span class="font-semibold text-gray-800 text-xs sm:text-sm truncate">{{ $jadwal->mapel }}</span>
+                                        <span class="font-semibold text-gray-800 text-xs sm:text-sm truncate">{{ strtoupper($jadwal->mapel) }}</span>
                                     </div>
                                 </td>
                                 <td class="px-3 sm:px-6 py-3 sm:py-4 text-center">
                                     <div class="inline-flex items-center gap-1 sm:gap-2 bg-purple-100 px-2 sm:px-3 py-1 sm:py-2 rounded-lg">
                                         <i class="fa-solid fa-users text-purple-600 text-xs sm:text-sm"></i>
-                                        <span class="font-semibold text-purple-800 text-xs sm:text-sm">{{ $jadwal->kelas }}</span>
+                                        <span class="font-semibold text-purple-800 text-xs sm:text-sm">{{ strtoupper($jadwal->kelas->nama_kelas) }}</span>
                                     </div>
                                 </td>
                             </tr>

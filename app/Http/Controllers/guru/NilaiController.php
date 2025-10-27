@@ -6,37 +6,64 @@ use Illuminate\Http\Request;
 use App\Models\JadwalPelajaran;
 use App\Models\Murid;
 use App\Models\Nilai;
+use App\Models\Kelas;
+use Illuminate\Support\Facades\Auth;
 
 class NilaiController extends Controller
 {
     public function index(Request $request)
     {
         $guruNama = auth()->user()->name;
-        $jadwalGuru = JadwalPelajaran::where('guru', $guruNama)->get();
+        $jadwalGuru = JadwalPelajaran::with('kelas')->where('guru', $guruNama)->get();
+
+        $mapelSelected = strtoupper($request->mapel ?? '');
+        $kelasIdSelected = $request->kelas_id ?? null;
+
+        // Ambil daftar mapel unik
         $mapelList = collect();
-        if ($request->kelas) {
-            $mapelList = $jadwalGuru->where('kelas', $request->kelas)->pluck('mapel')->unique();
+        if ($kelasIdSelected) {
+            $mapelList = $jadwalGuru
+                ->filter(fn($j) => $j->kelas_id == $kelasIdSelected)
+                ->pluck('mapel')
+                ->unique(fn($m) => strtoupper($m));
         } else {
-            $mapelList = $jadwalGuru->pluck('mapel')->unique();
+            $mapelList = $jadwalGuru
+                ->pluck('mapel')
+                ->unique(fn($m) => strtoupper($m));
         }
-        // Kelas yang benar-benar diajar mapel tertentu oleh guru
+
+        // Ambil daftar kelas unik berdasarkan ID
         $kelasList = collect();
-        if ($request->mapel) {
-            $kelasList = $jadwalGuru->where('mapel', $request->mapel)->pluck('kelas')->unique();
+        if ($mapelSelected) {
+            $kelasIds = $jadwalGuru
+                ->filter(fn($j) => strtoupper($j->mapel) === $mapelSelected)
+                ->pluck('kelas_id')
+                ->unique();
+            $kelasList = Kelas::whereIn('id', $kelasIds)->get();
         } else {
-            $kelasList = $jadwalGuru->pluck('kelas')->unique();
+            $kelasIds = $jadwalGuru->pluck('kelas_id')->unique();
+            $kelasList = Kelas::whereIn('id', $kelasIds)->get();
         }
+
         $muridList = collect();
         $muridSudahDinilai = collect();
-        $mapelSelected = $request->mapel;
-        $kelasSelected = $request->kelas;
         $nilaiDraft = collect();
-        $hasUngraded = false; // Ensure initialization outside the conditional block
-        if ($mapelSelected && $kelasSelected) {
-            $muridList = Murid::where('kelas', $kelasSelected)->get();
-            $muridSudahDinilai = Nilai::where('mapel', $mapelSelected)->where('kelas', $kelasSelected)->get();
-            $nilaiDraft = Nilai::where('mapel', $mapelSelected)
-                ->where('kelas', $kelasSelected)
+        $hasUngraded = false;
+        $kelasSelected = null;
+
+        if ($mapelSelected && $kelasIdSelected) {
+            // Pastikan guru mengajar kombinasi ini
+            $this->authorizeByMapelKelas($mapelSelected, $kelasIdSelected);
+
+            $kelasSelected = Kelas::find($kelasIdSelected);
+
+            $muridList = Murid::where('kelas_id', $kelasIdSelected)->get();
+            $muridSudahDinilai = Nilai::whereRaw('UPPER(mapel) = ?', [$mapelSelected])
+                ->where('kelas_id', $kelasIdSelected)
+                ->get();
+
+            $nilaiDraft = Nilai::whereRaw('UPPER(mapel) = ?', [$mapelSelected])
+                ->where('kelas_id', $kelasIdSelected)
                 ->where('status', 'draft')
                 ->get();
 
@@ -48,31 +75,88 @@ class NilaiController extends Controller
                 return $murid;
             });
         }
-        return view('guru.nilai.index', compact('mapelList', 'kelasList', 'muridList', 'muridSudahDinilai', 'mapelSelected', 'kelasSelected', 'nilaiDraft', 'hasUngraded'));
+
+        return view('guru.nilai.index', compact(
+            'mapelList',
+            'kelasList',
+            'muridList',
+            'muridSudahDinilai',
+            'mapelSelected',
+            'kelasIdSelected',
+            'kelasSelected',
+            'nilaiDraft',
+            'hasUngraded'
+        ));
+    }
+
+    protected function authorizeByMapelKelas($mapel, $kelasId)
+    {
+        $guruNama = auth()->user()->name;
+        $exists = JadwalPelajaran::whereRaw('UPPER(mapel) = ?', [strtoupper($mapel)])
+            ->where('kelas_id', $kelasId)
+            ->where('guru', $guruNama)
+            ->exists();
+
+        if (!$exists) {
+            abort(403, 'Anda tidak memiliki izin untuk melihat atau mengubah nilai untuk mapel/kelas ini.');
+        }
+    }
+
+    protected function authorizeByNilai($nilai)
+    {
+        $guruNama = auth()->user()->name;
+        $allowed = false;
+
+        if ($nilai->jadwal_id) {
+            $allowed = JadwalPelajaran::where('id', $nilai->jadwal_id)
+                ->where('guru', $guruNama)
+                ->exists();
+        }
+
+        if (!$allowed) {
+            // fallback: cocokkan berdasarkan mapel dan kelas_id
+            $allowed = JadwalPelajaran::whereRaw('UPPER(mapel) = ?', [strtoupper($nilai->mapel)])
+                ->where('kelas_id', $nilai->kelas_id)
+                ->where('guru', $guruNama)
+                ->exists();
+        }
+
+        if (!$allowed) {
+            abort(403, 'Anda tidak memiliki izin untuk mengubah nilai ini.');
+        }
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'mapel' => 'required',
-            'kelas' => 'required',
+            'kelas_id' => 'required|exists:kelas,id',
             'nilai_tugas' => 'required|array',
             'nilai_uts' => 'required|array',
             'nilai_uas' => 'required|array',
         ]);
+
+        $mapel = strtoupper($request->mapel);
+        $kelasId = $request->kelas_id;
+
+        $this->authorizeByMapelKelas($mapel, $kelasId);
+
+        $jadwal = JadwalPelajaran::whereRaw('UPPER(mapel) = ?', [$mapel])
+            ->where('kelas_id', $kelasId)
+            ->where('guru', auth()->user()->name)
+            ->first();
+
+        $jadwalId = $jadwal ? $jadwal->id : null;
+
         foreach ($request->nilai_tugas as $muridId => $nilaiTugas) {
             $nilaiUts = $request->nilai_uts[$muridId] ?? null;
             $nilaiUas = $request->nilai_uas[$muridId] ?? null;
-            $jadwal = \App\Models\JadwalPelajaran::where('mapel', $request->mapel)
-                ->where('kelas', $request->kelas)
-                ->where('guru', auth()->user()->name)
-                ->first();
-            $jadwalId = $jadwal ? $jadwal->id : null;
-            \App\Models\Nilai::updateOrCreate(
+
+            Nilai::updateOrCreate(
                 [
                     'murid_id' => $muridId,
-                    'kelas' => $request->kelas,
-                    'mapel' => $request->mapel,
+                    'kelas_id' => $kelasId,
+                    'mapel' => $mapel,
                 ],
                 [
                     'jadwal_id' => $jadwalId,
@@ -83,7 +167,8 @@ class NilaiController extends Controller
                 ]
             );
         }
-        return redirect()->route('guru.nilai.index', ['mapel' => $request->mapel, 'kelas' => $request->kelas])
+
+        return redirect()->route('guru.nilai.index', ['mapel' => $mapel, 'kelas_id' => $kelasId])
             ->with('success', 'Nilai berhasil disimpan sebagai draft!');
     }
 
@@ -91,40 +176,56 @@ class NilaiController extends Controller
     {
         $request->validate([
             'mapel' => 'required',
-            'kelas' => 'required',
+            'kelas_id' => 'required|exists:kelas,id',
         ]);
-        $nilaiDraft = \App\Models\Nilai::where('mapel', $request->mapel)
-            ->where('kelas', $request->kelas)
+
+        $mapel = strtoupper($request->mapel);
+        $kelasId = $request->kelas_id;
+
+        $this->authorizeByMapelKelas($mapel, $kelasId);
+
+        $nilaiDraft = Nilai::whereRaw('UPPER(mapel) = ?', [$mapel])
+            ->where('kelas_id', $kelasId)
             ->where('status', 'draft')
             ->get();
+
         foreach ($nilaiDraft as $nilai) {
             $nilai->status = 'publish';
             $nilai->save();
         }
-        return redirect()->route('guru.nilai.index', ['mapel' => $request->mapel, 'kelas' => $request->kelas])
+
+        return redirect()->route('guru.nilai.index', ['mapel' => $mapel, 'kelas_id' => $kelasId])
             ->with('success', 'Nilai berhasil dipublikasi!');
     }
 
     public function edit($id)
     {
-        $nilai = \App\Models\Nilai::findOrFail($id);
+        $nilai = Nilai::findOrFail($id);
+        $this->authorizeByNilai($nilai);
         $murid = $nilai->murid;
+
         return view('guru.nilai.edit', compact('nilai', 'murid'));
     }
 
-    public function update(\Illuminate\Http\Request $request, $id)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'nilai_tugas' => 'required|integer|min:0|max:100',
             'nilai_uts' => 'required|integer|min:0|max:100',
             'nilai_uas' => 'required|integer|min:0|max:100',
         ]);
-        $nilai = \App\Models\Nilai::findOrFail($id);
+
+        $nilai = Nilai::findOrFail($id);
+        $this->authorizeByNilai($nilai);
+
         $nilai->nilai_tugas = $request->nilai_tugas;
         $nilai->nilai_uts = $request->nilai_uts;
         $nilai->nilai_uas = $request->nilai_uas;
         $nilai->save();
-        return redirect()->route('guru.nilai.index', ['mapel' => $nilai->mapel, 'kelas' => $nilai->kelas])
-            ->with('success', 'Nilai berhasil diupdate!');
+
+        return redirect()->route('guru.nilai.index', [
+            'mapel' => strtoupper($nilai->mapel),
+            'kelas_id' => $nilai->kelas_id
+        ])->with('success', 'Nilai berhasil diupdate!');
     }
 }

@@ -39,4 +39,8 @@ class Guru extends Model
     {
         return $this->belongsTo(Sekolah::class, 'sekolah_id');
     }
+    public function staf()
+    {
+        return $this->hasOne(Staf::class, 'nip', 'nip');
+    }
 }

@@ -14,13 +14,13 @@
                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
-                Jadwal Pelajaran
+                Jadwal
             </button>
             <button id="tab-nilai" class="tab-btn px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200">
                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                 </svg>
-                Nilai Siswa
+                Nilai
             </button>
         </div>
         
@@ -97,9 +97,6 @@
         <!-- Nilai Content -->
         <div id="content-nilai" class="tab-content hidden">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                @php
-                    $nilaiPublish = $nilaiList->where('status', 'publish');
-                @endphp
                 @forelse($nilaiPublish as $nilai)
                 <div class="bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-200 overflow-hidden transition-all duration-200 hover:-translate-y-1">
                     
@@ -110,7 +107,7 @@
                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                             </svg>
-                            {{ $nilai->kelas }}
+                            {{ strtoupper($nilai->kelas->nama_kelas) }}
                         </span>
                     </div>
 

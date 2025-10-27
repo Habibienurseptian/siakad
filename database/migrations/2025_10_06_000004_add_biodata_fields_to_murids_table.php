@@ -16,6 +16,10 @@ return new class extends Migration
             $table->string('kode_pos')->nullable();
             $table->string('tempat_lahir_orangtua')->nullable();
             $table->date('tanggal_lahir_orangtua')->nullable();
+            $table->string('profile_image')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('nama_orangtua')->nullable();
+            $table->string('telepon_orangtua')->nullable();
         });
     }
 

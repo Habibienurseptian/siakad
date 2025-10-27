@@ -54,11 +54,11 @@
                     @endphp
 
                     @if($role === 'murid' && $murid)
-                        <p class="text-xs text-gray-600 truncate">{{ $murid->kelas ?? '-' }} | {{ $murid->nomor_induk ?? '-' }}</p>
+                        <p class="text-xs text-gray-600 truncate">{{ strtoupper($murid->kelas->nama_kelas ?? '-') }} | {{ $murid->nomor_induk ?? '-' }}</p>
                     @elseif($role === 'guru' && $guru)
                         <p class="text-xs text-gray-600">Guru | {{ $guru->nip ?? '-' }}</p>
                     @elseif($role === 'staf' && $staf)
-                        <p class="text-xs text-gray-600">Staf | {{ $staf->nip ?? '-' }}</p>
+                        <p class="text-xs text-gray-600">{{ $staf->bidang ? $staf->bidang : 'Staf' }} | {{ $staf->nip ?? '-' }}</p>
                     @else
                         <p class="text-xs text-gray-600">{{ ucfirst($role) }}</p>
                     @endif
@@ -111,6 +111,11 @@
             @break
 
             @case('staf')
+                @php
+                    $staf = \App\Models\Staf::where('user_id', Auth::id())->first();
+                    $bidang = strtolower(trim($staf->bidang ?? ''));
+                @endphp
+
                 <a href="{{ route('staf.dashboard') }}" 
                    class="nav-link {{ request()->is('staf/dashboard*') ? 'active' : '' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,34 +123,68 @@
                     </svg>
                     <span>Dashboard</span>
                 </a>
-                <a href="{{ route('staf.keuangan.index') }}" 
-                   class="nav-link {{ request()->is('staf/keuangan*') ? 'active' : '' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span>Keuangan</span>
-                </a>
-                <a href="{{ route('staf.pembayaran.index') }}" 
-                   class="nav-link {{ request()->is('staf/pembayaran*') ? 'active' : '' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    <span>Pembayaran</span>
-                </a>
-                <a href="{{ route('staf.jadwal.index') }}" 
-                   class="nav-link {{ request()->is('staf/jadwal*') ? 'active' : '' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                    <span>Jadwal Pelajaran</span>
-                </a>
-                <a href="{{ route('staf.pengumuman.index') }}" 
-                   class="nav-link {{ request()->is('staf/pengumuman*') ? 'active' : '' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
-                    </svg>
-                    <span>Pengumuman</span>
-                </a>
+
+                @if(Str::contains($bidang, 'keu') || $bidang === 'keuangan')
+                    <a href="{{ route('staf.keuangan.index') }}" 
+                       class="nav-link {{ request()->is('staf/keuangan*') ? 'active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Keuangan</span>
+                    </a>
+                    <a href="{{ route('staf.pembayaran.index') }}" 
+                       class="nav-link {{ request()->is('staf/pembayaran*') ? 'active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <span>Pembayaran</span>
+                    </a>
+                @elseif(Str::contains($bidang, 'akad') || $bidang === 'akademik')
+                    <a href="{{ route('staf.jadwal.index') }}" 
+                       class="nav-link {{ request()->is('staf/jadwal*') ? 'active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Jadwal Pelajaran</span>
+                    </a>
+                    <a href="{{ route('staf.pengumuman.index') }}" 
+                       class="nav-link {{ request()->is('staf/pengumuman*') ? 'active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+                        </svg>
+                        <span>Pengumuman</span>
+                    </a>
+                @else
+                    <!-- default: show both groups if bidang not set or unrecognized -->
+                    <a href="{{ route('staf.keuangan.index') }}" 
+                       class="nav-link {{ request()->is('staf/keuangan*') ? 'active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Keuangan</span>
+                    </a>
+                    <a href="{{ route('staf.pembayaran.index') }}" 
+                       class="nav-link {{ request()->is('staf/pembayaran*') ? 'active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <span>Pembayaran</span>
+                    </a>
+                    <a href="{{ route('staf.jadwal.index') }}" 
+                       class="nav-link {{ request()->is('staf/jadwal*') ? 'active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Jadwal Pelajaran</span>
+                    </a>
+                    <a href="{{ route('staf.pengumuman.index') }}" 
+                       class="nav-link {{ request()->is('staf/pengumuman*') ? 'active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7 a3.988 3.988 0 01-1.564-.317z"></path>
+                        </svg>
+                        <span>Pengumuman</span>
+                    </a>
+                @endif
             @break
 
             @case('guru')

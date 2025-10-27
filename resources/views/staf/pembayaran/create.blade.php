@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 py-6">
-    <div class="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+    <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         
         <!-- Header Section -->
         <div class="mb-8">
@@ -33,7 +33,7 @@
                     </div>
                     <div class="flex-1">
                         <h2 class="text-xl font-bold text-white">{{ $murid->user->name ?? '-' }}</h2>
-                        <p class="text-green-100 text-sm">{{ $murid->nomor_induk }} • Kelas {{ $murid->kelas }}</p>
+                        <p class="text-green-100 text-sm">{{ $murid->nomor_induk }} • Kelas {{ strtoupper($murid->kelas->nama_kelas ?? '-') }}</p>
                     </div>
                     <div class="text-right">
                         <div class="text-green-100 text-sm">Sekolah</div>

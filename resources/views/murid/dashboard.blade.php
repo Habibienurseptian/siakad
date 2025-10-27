@@ -53,7 +53,7 @@
                         </span>
                     </div>
                     <div>
-                            <p class="text-gray-700 font-medium">Kelas {{ $jadwal->kelas ?? '-' }}</p>
+                            <p class="text-gray-700 font-medium">Kelas {{ strtoupper($jadwal->kelas->nama_kelas ?? '-') }}</p>
                             <p class="text-gray-500 text-sm flex items-center mt-1">
                                 <i class="fas fa-user-tie mr-1 text-gray-400"></i>
                                 {{ $jadwal->guru }}

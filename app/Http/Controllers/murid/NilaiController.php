@@ -10,13 +10,17 @@ class NilaiController extends Controller
 {
     public function index()
     {
-        $murid = Murid::where('user_id', auth()->id())->first();
-        $nilaiList = collect();
+        $murid = Murid::with('kelas')->where('user_id', auth()->id())->first();
+
         $nilaiPublish = collect();
+
         if ($murid) {
-            $nilaiList = Nilai::where('murid_id', $murid->id)->get();
-            $nilaiPublish = $nilaiList->where('status', 'publish');
+            $nilaiPublish = Nilai::with('kelas')
+                ->where('murid_id', $murid->id)
+                ->where('status', 'publish')
+                ->get();
         }
-        return view('murid.nilai.index', compact('nilaiList', 'nilaiPublish'));
+
+        return view('murid.jadwal.index', compact('nilaiPublish'));
     }
 }

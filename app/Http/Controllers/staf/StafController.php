@@ -14,13 +14,24 @@ class StafController extends Controller
 {
     public function index()
     {
-        $data = [
-            'totalSiswa' => Murid::count(),
-            'totalGuru'  => Guru::count(),
-            'totalStaf'  => Staf::count(),
-        ];
-
         $staf = Staf::where('user_id', auth()->id())->first();
+
+        // Jika staf terkait dengan sekolah, hitung ringkasan berdasarkan sekolah tersebut
+        if ($staf && $staf->sekolah_id) {
+            $sekolahId = $staf->sekolah_id;
+            $data = [
+                'totalSiswa' => Murid::where('sekolah_id', $sekolahId)->count(),
+                'totalGuru'  => Guru::where('sekolah_id', $sekolahId)->count(),
+                'totalStaf'  => Staf::where('sekolah_id', $sekolahId)->count(),
+            ];
+        } else {
+            // fallback ke total global jika staf tidak terkait sekolah
+            $data = [
+                'totalSiswa' => Murid::count(),
+                'totalGuru'  => Guru::count(),
+                'totalStaf'  => Staf::count(),
+            ];
+        }
         $pengumuman_terbaru = collect();
         $pengumuman_akademik = collect();
         if ($staf && $staf->sekolah_id) {
@@ -36,7 +47,6 @@ class StafController extends Controller
             return $item;
         });
 
-        // Greeting & userName logic
         $hour = Carbon::now('Asia/Jakarta')->format('H');
         if($hour < 12){
             $greeting = 'Selamat Pagi';

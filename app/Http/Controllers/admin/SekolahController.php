@@ -63,9 +63,66 @@ class SekolahController extends Controller
 
     public function show($id)
     {
-    $sekolah = Sekolah::findOrFail($id);
-    $gurus = \App\Models\User::where('role', 'guru')->orderBy('name')->get();
-    $murids = \App\Models\User::where('role', 'murid')->orderBy('name')->get();
-    return view('admin.sekolah.show', compact('sekolah', 'gurus', 'murids'));
+        $sekolah = Sekolah::findOrFail($id);
+        $classes = \App\Models\Kelas::where('sekolah_id', $sekolah->id)
+            ->orderBy('nama_kelas')
+            ->get();
+
+        $classCount = $classes->count();
+
+        return view('admin.sekolah.show', compact('sekolah', 'classes', 'classCount',));
     }
+
+    public function storeKelas(Request $request, $id)
+    {
+        $sekolah = Sekolah::findOrFail($id);
+
+        $request->validate([
+            'nama_kelas' => 'required|string|max:100',
+            'wali_kelas' => 'nullable|string|max:100',
+            'jumlah_siswa' => 'nullable|integer|min:0',
+        ]);
+
+        // Simpan ke tabel 'kelas'
+        \App\Models\Kelas::create([
+            'sekolah_id' => $sekolah->id,
+            'nama_kelas' => $request->nama_kelas,
+            'wali_kelas' => $request->wali_kelas,
+            'jumlah_siswa' => $request->jumlah_siswa,
+        ]);
+
+        return redirect()->route('admin.sekolah.show', $sekolah->id)
+            ->with('success', 'Kelas berhasil ditambahkan!');
+    }
+
+    public function updateKelas(Request $request, $id, $kelasId)
+    {
+        $request->validate(['nama_kelas' => 'required|string|max:255']);
+
+        $kelasModel = \App\Models\Kelas::where('sekolah_id', $id)
+            ->where('id', $kelasId)
+            ->firstOrFail();
+
+        $kelasModel->update([
+            'nama_kelas' => $request->nama_kelas,
+            'wali_kelas' => $request->wali_kelas,
+            'jumlah_siswa' => $request->jumlah_siswa,
+        ]);
+
+        return redirect()->route('admin.sekolah.show', $id)
+            ->with('success', 'Kelas berhasil diperbarui.');
+    }
+
+    public function destroyKelas($id, $kelasId)
+    {
+        $kelasModel = \App\Models\Kelas::where('sekolah_id', $id)
+            ->where('nama_kelas', $kelasId)
+            ->firstOrFail();
+
+        $kelasModel->delete();
+
+        return redirect()->route('admin.sekolah.show', $id)->with('success', 'Kelas berhasil dihapus.');
+    }
+
+
 }

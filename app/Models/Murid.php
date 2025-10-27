@@ -26,7 +26,7 @@ class Murid extends Model
     protected $fillable = [
         'user_id',
         'nomor_induk',
-        'kelas',
+        'kelas_id',
         'sekolah_id',
         'phone',
         'nama_orangtua',
@@ -54,5 +54,9 @@ class Murid extends Model
     public function tagihans()
     {
         return $this->hasMany(Tagihan::class, 'murid_id') ?? collect();
+    }
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 }

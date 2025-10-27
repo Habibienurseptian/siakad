@@ -25,6 +25,24 @@
                     </select>
                 </div>
                 <div>
+                    <label class="block text-sm font-semibold mb-1">Guru</label>
+                    <select name="guru" class="w-full border rounded px-3 py-2" required>
+                        <option value="">Pilih Guru</option>
+                        @foreach($gurus as $guru)
+                            <option value="{{ $guru->user ? $guru->user->name : $guru->name ?? '-' }}">{{ $guru->user ? $guru->user->name : $guru->name ?? '-' }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Kelas</label>
+                    <select name="kelas_id" class="w-full border rounded px-3 py-2" required>
+                        <option value="">Pilih Kelas</option>
+                        @foreach($sekolah->kelas as $kelas)
+                            <option value="{{ $kelas->id }}">{{ $kelas->nama_kelas }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
                     <label class="block text-sm font-semibold mb-1">Jam Mulai</label>
                     <input type="time" name="jam_mulai" class="w-full border rounded px-3 py-2" required>
                 </div>
@@ -36,19 +54,7 @@
                     <label class="block text-sm font-semibold mb-1">Mata Pelajaran</label>
                     <input type="text" name="mapel" class="w-full border rounded px-3 py-2" required>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-1">Guru</label>
-                    <select name="guru" class="w-full border rounded px-3 py-2" required>
-                        <option value="">Pilih Guru</option>
-                        @foreach($gurus as $guru)
-                            <option value="{{ $guru->user ? $guru->user->name : $guru->name ?? '-' }}">{{ $guru->user ? $guru->user->name : $guru->name ?? '-' }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-1">Kelas</label>
-                    <input type="text" name="kelas" class="w-full border rounded px-3 py-2" required>
-                </div>
+        
             </form>
         </div>
         <!-- Footer -->

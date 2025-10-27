@@ -11,9 +11,9 @@ class CreateStafsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('nip')->unique();
+            $table->string('bidang')->nullable();
             $table->unsignedBigInteger('sekolah_id');
             $table->timestamps();
-
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('sekolah_id')->references('id')->on('sekolahs')->onDelete('cascade');
         });

@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => RoleMiddleware::class,
+            'bidang' => \App\Http\Middleware\CheckBidang::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

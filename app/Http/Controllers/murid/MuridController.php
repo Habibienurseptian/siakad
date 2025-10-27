@@ -55,7 +55,7 @@ class MuridController extends Controller
     // $murid sudah diambil di atas
         $jadwalHariIni = collect();
         if ($murid) {
-            $jadwalHariIni = \App\Models\JadwalPelajaran::where('kelas', $murid->kelas)
+            $jadwalHariIni = \App\Models\JadwalPelajaran::where('kelas_id', $murid->kelas_id)
                 ->whereRaw('REPLACE(LOWER(hari), " ", "") = ?', [strtolower(str_replace(' ', '', $hariNow))])
                 ->orderBy('jam_mulai')
                 ->get();
