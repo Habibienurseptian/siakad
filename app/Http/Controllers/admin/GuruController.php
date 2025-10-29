@@ -131,4 +131,32 @@ class GuruController extends Controller
         $guru->delete();
         return redirect()->route('admin.guru.index')->with('success', 'Data guru berhasil dihapus!');
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|string',
+        ]);
+
+        $ids = explode(',', $request->ids);
+
+        try {
+            \DB::beginTransaction();
+
+            $gurus = Guru::whereIn('id', $ids)->get();
+            foreach ($gurus as $guru) {
+                if ($guru->user) {
+                    $guru->user->delete();
+                }
+                $guru->delete();
+            }
+
+            \DB::commit();
+            return redirect()->route('admin.guru.index')->with('success', count($gurus) . ' data guru berhasil dihapus!');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()->route('admin.guru.index')->with('error', 'Gagal menghapus data guru: ' . $e->getMessage());
+        }
+}
+
 }

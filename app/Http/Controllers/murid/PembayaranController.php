@@ -42,7 +42,6 @@ class PembayaranController extends Controller
     {
         $tagihan = Tagihan::findOrFail($id);
 
-        // Hitung total tagihan
         $total = (
             ($tagihan->pembayaran_spp ?? 0) +
             ($tagihan->uang_saku ?? 0) +
@@ -53,12 +52,10 @@ class PembayaranController extends Controller
             ($tagihan->uang_zakat ?? 0)
         );
 
-        // Ambil kredensial dari .env
         $va = env('IPAYMU_VA');
         $apiKey = env('IPAYMU_API_KEY');
         $url = 'https://sandbox.ipaymu.com/api/v2/payment/direct';
 
-        // Data transaksi
         $body = [
             'name' => auth()->user()->name ?? 'Siswa',
             'phone' => '081234567890',
@@ -71,7 +68,6 @@ class PembayaranController extends Controller
             'paymentMethod' => 'qris',
         ];
 
-        // Buat signature
         $jsonBody = json_encode($body, JSON_UNESCAPED_SLASHES);
         $requestBody = strtolower(hash('sha256', $jsonBody));
         $stringToSign = strtoupper('POST') . ':' . $va . ':' . $requestBody . ':' . $apiKey;
@@ -79,7 +75,6 @@ class PembayaranController extends Controller
         $timestamp = now()->format('YmdHis');
 
         try {
-            // Kirim request ke iPaymu
             $response = Http::withHeaders([
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
@@ -88,18 +83,15 @@ class PembayaranController extends Controller
                 'timestamp' => $timestamp,
             ])->post($url, $body);
 
-            // Cek apakah sukses
             if (!$response->ok()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Gagal menghubungi server iPaymu.',
+                    'message' => 'Menunggu Pemabayaran.',
                     'debug' => $response->body(),
                 ]);
             }
 
             $result = $response->json();
-
-            // Pastikan format response benar
             if (isset($result['Data']['Url'])) {
                 return response()->json([
                     'success' => true,
@@ -113,7 +105,6 @@ class PembayaranController extends Controller
                 ]);
             }
         } catch (\Exception $e) {
-            // Tangani error jaringan, SSL, dsb
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan koneksi: ' . $e->getMessage(),

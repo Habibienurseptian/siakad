@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Hash;
 
 class MuridController extends Controller
 {
-    // Tampilkan data murid
     public function index(Request $request)
     {
         $search = $request->input('search', []);
@@ -50,7 +49,6 @@ class MuridController extends Controller
         return view('admin.murid.index', compact('murids', 'sekolahs', 'search'));
     }
 
-    // Simpan akun murid baru
     public function store(Request $request)
     {
         $request->validate([
@@ -64,7 +62,6 @@ class MuridController extends Controller
             'telepon_orangtua' => 'nullable|string|max:25',
         ]);
 
-        // Simpan user baru
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -72,7 +69,7 @@ class MuridController extends Controller
             'role' => 'murid',
         ]);
 
-        // Simpan murid
+
         Murid::create([
             'user_id' => $user->id,
             'nomor_induk' => $request->nomor_induk,
@@ -85,7 +82,6 @@ class MuridController extends Controller
         return redirect()->route('admin.murid.index')->with('success', 'Akun murid berhasil ditambahkan!');
     }
 
-    // Detail murid
     public function show($id)
     {
         $murid = Murid::with(['user', 'sekolah', 'kelas'])->findOrFail($id);
@@ -93,7 +89,6 @@ class MuridController extends Controller
         return view('admin.murid.show', compact('murid', 'sekolah'));
     }
 
-    // Edit murid
     public function edit($id)
     {
         $murid = Murid::with(['user', 'sekolah', 'kelas'])->findOrFail($id);
@@ -104,7 +99,6 @@ class MuridController extends Controller
         return view('admin.murid.edit', compact('murid', 'sekolah', 'kelasList', 'sekolahs'));
     }
 
-    // Update murid
     public function update(Request $request, $id)
     {
         $murid = Murid::with(['user', 'sekolah'])->findOrFail($id);
@@ -120,14 +114,12 @@ class MuridController extends Controller
             'password' => 'nullable|string|min:8',
         ]);
 
-        // Update user
         $murid->user->update([
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password ? Hash::make($request->password) : $murid->user->password,
         ]);
 
-        // Update murid
         $murid->update([
             'nomor_induk' => $request->nomor_induk,
             'kelas_id' => $request->kelas_id,
@@ -139,7 +131,6 @@ class MuridController extends Controller
         return redirect()->route('admin.murid.index')->with('success', 'Data murid berhasil diupdate!');
     }
 
-    // Hapus murid
     public function destroy($id)
     {
         $murid = Murid::findOrFail($id);
@@ -152,4 +143,38 @@ class MuridController extends Controller
 
         return redirect()->route('admin.murid.index')->with('success', 'Data murid berhasil dihapus!');
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|string',
+        ]);
+
+        $ids = explode(',', $request->ids);
+
+        try {
+            \DB::beginTransaction();
+
+            $murids = Murid::whereIn('id', $ids)->get();
+
+            foreach ($murids as $murid) {
+                if ($murid->user) {
+                    $murid->user->delete();
+                }
+                $murid->delete();
+            }
+
+            \DB::commit();
+
+            return redirect()
+                ->route('admin.murid.index')
+                ->with('success', count($murids) . ' data murid berhasil dihapus!');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()
+                ->route('admin.murid.index')
+                ->with('error', 'Gagal menghapus data murid: ' . $e->getMessage());
+        }
+    }
+
 }

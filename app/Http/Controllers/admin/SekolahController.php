@@ -83,7 +83,6 @@ class SekolahController extends Controller
             'jumlah_siswa' => 'nullable|integer|min:0',
         ]);
 
-        // Simpan ke tabel 'kelas'
         \App\Models\Kelas::create([
             'sekolah_id' => $sekolah->id,
             'nama_kelas' => $request->nama_kelas,

@@ -6,43 +6,6 @@
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
 
-        <!-- Notifikasi Sukses -->
-        @if(session('success'))
-            <div class="mb-6 bg-white border-l-4 border-green-500 rounded-lg shadow-sm p-4 flex items-start gap-3 animate-fade-in">
-                <div class="flex-shrink-0">
-                    <i class="fa-solid fa-circle-check text-green-500 text-xl"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-green-800 font-medium">{{ session('success') }}</p>
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-green-600 hover:text-green-800">
-                    <i class="fa-solid fa-times"></i>
-                </button>
-            </div>
-        @endif
-
-        <!-- Notifikasi Error -->
-        @if($errors->any())
-            <div class="mb-6 bg-white border-l-4 border-red-500 rounded-lg shadow-sm p-4 animate-fade-in">
-                <div class="flex items-start gap-3">
-                    <div class="flex-shrink-0">
-                        <i class="fa-solid fa-circle-exclamation text-red-500 text-xl"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-red-800 font-semibold mb-2">Terjadi kesalahan:</p>
-                        <ul class="space-y-1">
-                            @foreach($errors->all() as $error)
-                                <li class="text-red-700 text-sm flex items-start gap-2">
-                                    <span class="text-red-400">•</span>
-                                    <span>{{ $error }}</span>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        @endif
-
         <!-- School Cards -->
         <div class="space-y-6">
             @foreach($sekolahs as $sekolah)
@@ -71,9 +34,9 @@
 
                     <!-- Card Body -->
                     <div class="p-6">
-                        <!-- Search Form for Each School (always visible) -->
-                        <div class="mb-4">
-                            <form id="search-form-{{ $sekolah->id }}" action="{{ route('admin.guru.index') }}" method="GET" class="flex items-center gap-2 per-school-search-form" data-sekolah-id="{{ $sekolah->id }}">
+                        <!-- Search Form and Bulk Actions -->
+                        <div class="mb-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+                            <form id="search-form-{{ $sekolah->id }}" action="{{ route('admin.guru.index') }}" method="GET" class="flex items-center gap-2 per-school-search-form flex-1" data-sekolah-id="{{ $sekolah->id }}">
                                 <input 
                                     id="search-input-{{ $sekolah->id }}"
                                     data-sekolah-id="{{ $sekolah->id }}"
@@ -81,23 +44,47 @@
                                     name="search[{{ $sekolah->id }}]" 
                                     value="{{ $search[$sekolah->id] ?? (request('search')[$sekolah->id] ?? '') }}" 
                                     placeholder="Cari guru di {{ $sekolah->nama }}..." 
-                                    class="per-school-search-input w-full sm:w-1/3 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-green-200 focus:outline-none">
+                                    class="per-school-search-input w-full sm:w-auto flex-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-green-200 focus:outline-none">
                                 <button 
                                     type="submit" 
                                     class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition-all" aria-label="Cari">
                                     <i class="fa-solid fa-search"></i>
                                 </button>
                             </form>
+
+                            <!-- Bulk Actions Button -->
+                            <div id="bulk-actions-{{ $sekolah->id }}" class="hidden">
+                                <button 
+                                    onclick="bulkDelete({{ $sekolah->id }})" 
+                                    class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-trash"></i>
+                                    <span>Hapus Terpilih (<span id="count-{{ $sekolah->id }}">0</span>)</span>
+                                </button>
+                            </div>
                         </div>
                         
                         @php $guruCount = ($gurus[$sekolah->id]->currentPage() - 1) * $gurus[$sekolah->id]->perPage(); @endphp
                         
                         @if($gurus[$sekolah->id]->count() > 0)
+                            <!-- Bulk Delete Form -->
+                            <form id="bulk-delete-form-{{ $sekolah->id }}" action="{{ route('admin.guru.bulk-delete') }}" method="POST" style="display: none;">
+                                @csrf
+                                @method('DELETE')
+                                <input type="hidden" name="ids" id="bulk-ids-{{ $sekolah->id }}">
+                            </form>
+
                             <!-- Desktop Table View -->
-                            <div class="hidden md:block overflow-x-auto">
+                            <div class="hidden lg:block overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead>
                                         <tr class="bg-gray-50">
+                                            <th class="px-6 py-3 text-left">
+                                                <input 
+                                                    type="checkbox" 
+                                                    id="select-all-{{ $sekolah->id }}" 
+                                                    class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
+                                                    onchange="toggleAll({{ $sekolah->id }}, this.checked)">
+                                            </th>
                                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">No</th>
                                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">NIP</th>
                                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Guru</th>
@@ -108,6 +95,13 @@
                                         @foreach($gurus[$sekolah->id] as $guru)
                                             @php $guruCount++; @endphp
                                             <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        class="guru-checkbox-{{ $sekolah->id }} w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
+                                                        value="{{ $guru->id }}"
+                                                        onchange="updateBulkActions({{ $sekolah->id }})">
+                                                </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $guruCount }}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <span class="text-sm font-medium text-gray-900">{{ $guru->nip }}</span>
@@ -154,28 +148,43 @@
                                 </table>
                             </div>
 
-                            <!-- Mobile Card View -->
-                            <div class="md:hidden space-y-4">
+                            <!-- Mobile & Tablet Card View -->
+                            <div class="lg:hidden space-y-4">
                                 @php $guruCount = ($gurus[$sekolah->id]->currentPage() - 1) * $gurus[$sekolah->id]->perPage(); @endphp
                                 @foreach($gurus[$sekolah->id] as $guru)
                                     @php $guruCount++; @endphp
-                                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                                        <div class="flex items-start justify-between mb-3">
-                                            <div class="flex-1">
-                                                <div class="flex items-center gap-2 mb-1">
-                                                    <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-200">
-                                                        <img src="{{ $guru->profile_image ? asset('storage/' . $guru->profile_image) : asset('images/user.png') }}" 
-                                                             alt="Profile" 
-                                                             class="w-full h-full object-cover">
-                                                    </div>
-                                                    <span class="text-sm font-semibold text-gray-900">{{ $guru->user ? $guru->user->name : $guru->name ?? '-' }}</span>
+                                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow duration-200">
+                                        <div class="flex items-start gap-3 mb-3">
+                                            <div class="flex-shrink-0 pt-1">
+                                                <input 
+                                                    type="checkbox" 
+                                                    class="guru-checkbox-{{ $sekolah->id }} w-5 h-5 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
+                                                    value="{{ $guru->id }}"
+                                                    onchange="updateBulkActions({{ $sekolah->id }})">
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <div class="h-12 w-12 rounded-full overflow-hidden bg-gray-200">
+                                                    <img src="{{ $guru->profile_image ? asset('storage/' . $guru->profile_image) : asset('images/user.png') }}" 
+                                                         alt="Profile" 
+                                                         class="w-full h-full object-cover">
                                                 </div>
-                                                <p class="text-sm text-gray-600">NIP: <span class="font-medium">{{ $guru->nip }}</span></p>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-start justify-between gap-2 mb-1">
+                                                    <h3 class="text-base font-semibold text-gray-900 truncate">{{ $guru->user ? $guru->user->name : $guru->name ?? '-' }}</h3>
+                                                    <span class="inline-flex items-center justify-center min-w-[24px] h-6 bg-green-100 text-green-700 rounded-full text-xs font-semibold px-2">{{ $guruCount }}</span>
+                                                </div>
+                                                <div class="space-y-1">
+                                                    <p class="text-sm text-gray-600">
+                                                        <i class="fa-solid fa-id-card w-4 text-gray-400"></i>
+                                                        <span class="font-medium ml-1">{{ $guru->nip }}</span>
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-2 pt-3 border-t border-gray-200">
                                             <a href="{{ route('admin.guru.show', $guru->id) }}" 
-                                               class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium">
+                                               class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium">
                                                 <i class="fa-solid fa-eye"></i>
                                             </a>
                                             <a href="{{ route('admin.guru.edit', $guru->id) }}" 
@@ -205,8 +214,8 @@
                         @else
                             <!-- Empty State -->
                             <div class="text-center py-12">
-                                <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-                                    <i class="fa-solid fa-users text-gray-400 text-2xl"></i>
+                                <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-100 to-green-100 rounded-full mb-4">
+                                    <i class="fa-solid fa-chalkboard-user text-green-500 text-3xl"></i>
                                 </div>
                                 <h3 class="text-lg font-medium text-gray-900 mb-1">Belum Ada Data Guru</h3>
                                 <p class="text-gray-500 mb-6">Mulai tambahkan data guru untuk sekolah ini</p>
@@ -246,17 +255,66 @@
 </style>
 
 <script>
-    // Auto-submit per-school search form when the input is cleared
+    // Toggle all checkboxes
+    function toggleAll(sekolahId, checked) {
+        const checkboxes = document.querySelectorAll('.guru-checkbox-' + sekolahId);
+        checkboxes.forEach(cb => cb.checked = checked);
+        updateBulkActions(sekolahId);
+    }
+
+    // Update bulk actions visibility and count
+    function updateBulkActions(sekolahId) {
+        const checkedBoxes = Array.from(document.querySelectorAll('.guru-checkbox-' + sekolahId + ':checked'));
+        const uniqueIds = [...new Set(checkedBoxes.map(cb => cb.value))];
+
+        const bulkActions = document.getElementById('bulk-actions-' + sekolahId);
+        const count = document.getElementById('count-' + sekolahId);
+        const selectAll = document.getElementById('select-all-' + sekolahId);
+
+        if (uniqueIds.length > 0) {
+            bulkActions.classList.remove('hidden');
+            count.textContent = uniqueIds.length;
+        } else {
+            bulkActions.classList.add('hidden');
+        }
+
+        // Update checkbox select-all agar sinkron
+        const allBoxes = Array.from(document.querySelectorAll('.guru-checkbox-' + sekolahId));
+        const allUniqueIds = [...new Set(allBoxes.map(cb => cb.value))];
+        if (selectAll) {
+            selectAll.checked = uniqueIds.length === allUniqueIds.length && allUniqueIds.length > 0;
+        }
+    }
+
+    // Bulk delete function
+    function bulkDelete(sekolahId) {
+        const checkedBoxes = Array.from(document.querySelectorAll('.guru-checkbox-' + sekolahId + ':checked'));
+        const uniqueIds = [...new Set(checkedBoxes.map(cb => cb.value))];
+
+        if (uniqueIds.length === 0) {
+            alert('Pilih minimal satu guru untuk dihapus');
+            return;
+        }
+
+        if (confirm(`Yakin ingin menghapus ${uniqueIds.length} data guru yang dipilih?`)) {
+            document.getElementById('bulk-ids-' + sekolahId).value = uniqueIds.join(',');
+            document.getElementById('bulk-delete-form-' + sekolahId).submit();
+        }
+    }
+
+    // Auto-submit per-school search form when input is cleared
     (function(){
-        document.querySelectorAll('.per-school-search-input').forEach(function(input){
+        function submitFormIfEmpty(input) {
             var form = document.getElementById('search-form-' + input.dataset.sekolahId);
             if (!form) return;
             input.addEventListener('input', function(e){
                 var val = e.target.value.trim();
-                if (val === '') {
-                    form.submit();
-                }
+                if (val === '') form.submit();
             });
+        }
+
+        document.querySelectorAll('.per-school-search-input').forEach(function(input){
+            submitFormIfEmpty(input);
         });
     })();
 </script>

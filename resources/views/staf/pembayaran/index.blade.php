@@ -11,7 +11,6 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">Manajemen Pembayaran</h1>
-                    <p class="text-gray-600">Kelola pembayaran siswa dengan mudah dan efisien</p>
                 </div>
                 <div class="mt-4 sm:mt-0">
                     <div class="flex items-center space-x-2 text-sm text-gray-500">

@@ -41,9 +41,16 @@ Route::middleware(['auth'])->group(function () {
     // =======================
     Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+
+        Route::delete('murid/bulk-delete', [AdminMuridController::class, 'bulkDelete'])->name('murid.bulk-delete');
         Route::resource('murid', AdminMuridController::class)->names('murid');
+
+
         Route::resource('sekolah', SekolahController::class)->names('sekolah');
+
+        Route::delete('/guru/bulk-delete', [GuruController::class, 'bulkDelete'])->name('guru.bulk-delete');
         Route::resource('guru', GuruController::class)->names('guru');
+
         Route::resource('staf', AdminStafController::class)->names('staf');
 
         Route::post('sekolah/{id}/kelas', [SekolahController::class, 'storeKelas'])->name('sekolah.kelas.store');

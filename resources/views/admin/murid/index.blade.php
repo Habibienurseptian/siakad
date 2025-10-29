@@ -5,44 +5,6 @@
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-green-50 to-green-50 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
-
-        <!-- Notifikasi Sukses -->
-        @if(session('success'))
-            <div class="mb-6 bg-white border-l-4 border-green-500 rounded-lg shadow-sm p-4 flex items-start gap-3 animate-fade-in">
-                <div class="flex-shrink-0">
-                    <i class="fa-solid fa-circle-check text-green-500 text-xl"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-green-800 font-medium">{{ session('success') }}</p>
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-green-600 hover:text-green-800">
-                    <i class="fa-solid fa-times"></i>
-                </button>
-            </div>
-        @endif
-
-        <!-- Notifikasi Error -->
-        @if($errors->any())
-            <div class="mb-6 bg-white border-l-4 border-red-500 rounded-lg shadow-sm p-4 animate-fade-in">
-                <div class="flex items-start gap-3">
-                    <div class="flex-shrink-0">
-                        <i class="fa-solid fa-circle-exclamation text-red-500 text-xl"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-red-800 font-semibold mb-2">Terjadi kesalahan:</p>
-                        <ul class="space-y-1">
-                            @foreach($errors->all() as $error)
-                                <li class="text-red-700 text-sm flex items-start gap-2">
-                                    <span class="text-red-400">•</span>
-                                    <span>{{ $error }}</span>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        @endif
-
         <!-- School Cards -->
         <div class="space-y-6">
             @foreach($sekolahs as $sekolah)
@@ -71,9 +33,9 @@
 
                     <!-- Card Body -->
                     <div class="p-6">
-                        <!-- Search Form for Each School (always visible so value persists even when no results) -->
-                        <div class="mb-4">
-                            <form id="search-form-{{ $sekolah->id }}" action="{{ route('admin.murid.index') }}" method="GET" class="flex items-center gap-2 per-school-search-form" data-sekolah-id="{{ $sekolah->id }}">
+                        <!-- Search Form and Bulk Actions -->
+                        <div class="mb-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+                            <form id="search-form-{{ $sekolah->id }}" action="{{ route('admin.murid.index') }}" method="GET" class="flex items-center gap-2 per-school-search-form flex-1" data-sekolah-id="{{ $sekolah->id }}">
                                 <input 
                                     id="search-input-{{ $sekolah->id }}"
                                     data-sekolah-id="{{ $sekolah->id }}"
@@ -81,24 +43,47 @@
                                     name="search[{{ $sekolah->id }}]" 
                                     value="{{ $search[$sekolah->id] ?? (request('search')[$sekolah->id] ?? '') }}" 
                                     placeholder="Cari murid di {{ $sekolah->nama }}..." 
-                                    class="per-school-search-input w-full sm:w-1/3 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-green-200 focus:outline-none">
+                                    class="per-school-search-input w-full sm:w-auto flex-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-green-200 focus:outline-none">
                                 <button 
                                     type="submit" 
                                     class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition-all" aria-label="Cari">
                                     <i class="fa-solid fa-search"></i>
                                 </button>
-                                {{-- clear button removed per request --}}
                             </form>
+
+                            <!-- Bulk Actions Button -->
+                            <div id="bulk-actions-{{ $sekolah->id }}" class="hidden">
+                                <button 
+                                    onclick="bulkDelete({{ $sekolah->id }})" 
+                                    class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-trash"></i>
+                                    <span>Hapus Terpilih (<span id="count-{{ $sekolah->id }}">0</span>)</span>
+                                </button>
+                            </div>
                         </div>
 
                         @php $muridCount = ($murids[$sekolah->id]->currentPage() - 1) * $murids[$sekolah->id]->perPage(); @endphp
 
                         @if($murids[$sekolah->id]->count() > 0)
+                            <!-- Bulk Delete Form -->
+                            <form id="bulk-delete-form-{{ $sekolah->id }}" action="{{ route('admin.murid.bulk-delete') }}" method="POST" style="display: none;">
+                                @csrf
+                                @method('DELETE')
+                                <input type="hidden" name="ids" id="bulk-ids-{{ $sekolah->id }}">
+                            </form>
+
                             <!-- Desktop Table View -->
                             <div class="hidden lg:block overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead>
                                         <tr class="bg-gray-50">
+                                            <th class="px-6 py-3 text-left">
+                                                <input 
+                                                    type="checkbox" 
+                                                    id="select-all-{{ $sekolah->id }}" 
+                                                    class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
+                                                    onchange="toggleAll({{ $sekolah->id }}, this.checked)">
+                                            </th>
                                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">No</th>
                                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nomor Induk</th>
                                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Murid</th>
@@ -110,6 +95,13 @@
                                         @foreach($murids[$sekolah->id] as $murid)
                                             @php $muridCount++; @endphp
                                             <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        class="murid-checkbox-{{ $sekolah->id }} w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
+                                                        value="{{ $murid->id }}"
+                                                        onchange="updateBulkActions({{ $sekolah->id }})">
+                                                </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $muridCount }}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <span class="text-sm font-medium text-gray-900">{{ $murid->nomor_induk }}</span>
@@ -168,6 +160,13 @@
                                     @php $muridCount++; @endphp
                                     <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow duration-200">
                                         <div class="flex items-start gap-3 mb-3">
+                                            <div class="flex-shrink-0 pt-1">
+                                                <input 
+                                                    type="checkbox" 
+                                                    class="murid-checkbox-{{ $sekolah->id }} w-5 h-5 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
+                                                    value="{{ $murid->id }}"
+                                                    onchange="updateBulkActions({{ $sekolah->id }})">
+                                            </div>
                                             <div class="flex-shrink-0">
                                                 <div class="h-12 w-12 rounded-full overflow-hidden bg-gray-200">
                                                     <img src="{{ $murid->profile_image ? asset('storage/' . $murid->profile_image) : asset('images/user.png') }}" 
@@ -267,28 +266,68 @@
 </style>
 
 <script>
-    // Auto-submit per-school search form when the input is cleared
+    // Toggle all checkboxes
+    function toggleAll(sekolahId, checked) {
+        const checkboxes = document.querySelectorAll('.murid-checkbox-' + sekolahId);
+        checkboxes.forEach(cb => cb.checked = checked);
+        updateBulkActions(sekolahId);
+    }
+
+    // Update bulk actions visibility and count
+    function updateBulkActions(sekolahId) {
+        const checkedBoxes = Array.from(document.querySelectorAll('.murid-checkbox-' + sekolahId + ':checked'));
+        const uniqueIds = [...new Set(checkedBoxes.map(cb => cb.value))];
+
+        const bulkActions = document.getElementById('bulk-actions-' + sekolahId);
+        const count = document.getElementById('count-' + sekolahId);
+        const selectAll = document.getElementById('select-all-' + sekolahId);
+
+        if (uniqueIds.length > 0) {
+            bulkActions.classList.remove('hidden');
+            count.textContent = uniqueIds.length;
+        } else {
+            bulkActions.classList.add('hidden');
+        }
+
+        // Update checkbox select-all agar sinkron
+        const allBoxes = Array.from(document.querySelectorAll('.murid-checkbox-' + sekolahId));
+        const allUniqueIds = [...new Set(allBoxes.map(cb => cb.value))];
+        if (selectAll) {
+            selectAll.checked = uniqueIds.length === allUniqueIds.length && allUniqueIds.length > 0;
+        }
+    }
+
+    // Bulk delete function
+    function bulkDelete(sekolahId) {
+        const checkedBoxes = Array.from(document.querySelectorAll('.murid-checkbox-' + sekolahId + ':checked'));
+        const uniqueIds = [...new Set(checkedBoxes.map(cb => cb.value))];
+
+        if (uniqueIds.length === 0) {
+            alert('Pilih minimal satu murid untuk dihapus');
+            return;
+        }
+
+        if (confirm(`Yakin ingin menghapus ${uniqueIds.length} data murid yang dipilih?`)) {
+            document.getElementById('bulk-ids-' + sekolahId).value = uniqueIds.join(',');
+            document.getElementById('bulk-delete-form-' + sekolahId).submit();
+        }
+    }
+
+    // Auto-submit per-school search form when input is cleared
     (function(){
         function submitFormIfEmpty(input) {
             var form = document.getElementById('search-form-' + input.dataset.sekolahId);
             if (!form) return;
-            // when input becomes empty, submit to reset results
             input.addEventListener('input', function(e){
                 var val = e.target.value.trim();
-                if (val === '') {
-                    // remove the search param for this sekolah before submitting
-                    // create a temporary form to submit only existing inputs
-                    // but easiest is to submit the form (it will send empty value which controller treats as empty)
-                    form.submit();
-                }
+                if (val === '') form.submit();
             });
         }
 
         document.querySelectorAll('.per-school-search-input').forEach(function(input){
             submitFormIfEmpty(input);
         });
-
-        // clear button removed — only auto-submit-on-empty remains
     })();
 </script>
+
 @endsection
