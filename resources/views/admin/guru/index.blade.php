@@ -7,7 +7,7 @@
     <div class="max-w-7xl mx-auto">
 
         <!-- School Cards -->
-        <div class="space-y-6">
+        <div>
             @foreach($sekolahs as $sekolah)
                 <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
                     

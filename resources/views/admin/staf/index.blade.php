@@ -43,7 +43,7 @@
         @endif
 
         <!-- School Cards -->
-        <div class="space-y-6">
+        <div>
             @foreach($sekolahs as $sekolah)
                 <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
                     
@@ -73,7 +73,7 @@
                         @php $stafCount = ($stafs[$sekolah->id]->currentPage() - 1) * $stafs[$sekolah->id]->perPage(); @endphp
                         
                         @if($stafs[$sekolah->id]->count() > 0)
-                            <div class="space-y-3 sm:space-y-4">
+                            <div>
                                 @foreach($stafs[$sekolah->id] as $staf)
                                     @php $stafCount++; @endphp
                                     

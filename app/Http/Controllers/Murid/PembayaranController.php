@@ -40,76 +40,79 @@ class PembayaranController extends Controller
 
     public function ipaymu(Request $request, $id)
     {
-        $tagihan = Tagihan::findOrFail($id);
+    $tagihan = Tagihan::findOrFail($id);
 
-        $total = (
-            ($tagihan->pembayaran_spp ?? 0) +
-            ($tagihan->uang_saku ?? 0) +
-            ($tagihan->uang_kegiatan ?? 0) +
-            ($tagihan->uang_spi ?? 0) +
-            ($tagihan->uang_haul_maulid ?? 0) +
-            ($tagihan->uang_khidmah_infaq ?? 0) +
-            ($tagihan->uang_zakat ?? 0)
-        );
+    $total = (
+        ($tagihan->pembayaran_spp ?? 0) +
+        ($tagihan->uang_saku ?? 0) +
+        ($tagihan->uang_kegiatan ?? 0) +
+        ($tagihan->uang_spi ?? 0) +
+        ($tagihan->uang_haul_maulid ?? 0) +
+        ($tagihan->uang_khidmah_infaq ?? 0) +
+        ($tagihan->uang_zakat ?? 0)
+    );
 
-        $va = env('IPAYMU_VA');
-        $apiKey = env('IPAYMU_API_KEY');
-        $url = 'https://sandbox.ipaymu.com/api/v2/payment/direct';
+    $va      = env('IPAYMU_VA');
+    $apiKey  = env('IPAYMU_API_KEY');
+    $url     = 'https://sandbox.ipaymu.com/api/v2/payment';
+    $method  = 'POST';
 
-        $body = [
-            'name' => auth()->user()->name ?? 'Siswa',
-            'phone' => '081234567890',
-            'email' => auth()->user()->email ?? 'user@example.com',
-            'amount' => $total,
-            'referenceId' => (string) $tagihan->id,
-            'notifyUrl' => route('murid.pembayaran.notify'),
-            'returnUrl' => route('murid.dashboard'),
-            'cancelUrl' => route('murid.dashboard'),
-            'paymentMethod' => 'qris',
-        ];
+    $body = [
+        'product'       => ['Pembayaran Santri #' . $tagihan->id],
+        'qty'           => [1],
+        'price'         => [$total],
+        'returnUrl'     => route('murid.dashboard'),
+        'cancelUrl'     => route('murid.dashboard'),
+        'notifyUrl'     => route('murid.pembayaran.notify'),
+        'referenceId'   => (string) $tagihan->id,
+    ];
 
-        $jsonBody = json_encode($body, JSON_UNESCAPED_SLASHES);
-        $requestBody = strtolower(hash('sha256', $jsonBody));
-        $stringToSign = strtoupper('POST') . ':' . $va . ':' . $requestBody . ':' . $apiKey;
-        $signature = hash_hmac('sha256', $stringToSign, $apiKey);
-        $timestamp = now()->format('YmdHis');
+    $jsonBody     = json_encode($body, JSON_UNESCAPED_SLASHES);
+    $requestBody  = strtolower(hash('sha256', $jsonBody));
+    $stringToSign = strtoupper($method) . ':' . $va . ':' . $requestBody . ':' . $apiKey;
+    $signature    = hash_hmac('sha256', $stringToSign, $apiKey);
+    $timestamp    = date('YmdHis');
 
-        try {
-            $response = Http::withHeaders([
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'va' => $va,
-                'signature' => $signature,
-                'timestamp' => $timestamp,
-            ])->post($url, $body);
+    try {
+        $response = Http::withHeaders([
+            'Accept'     => 'application/json',
+            'Content-Type' => 'application/json',
+            'va'         => $va,
+            'signature'  => $signature,
+            'timestamp'  => $timestamp,
+        ])->withBody($jsonBody, 'application/json')->post($url);
 
-            if (!$response->ok()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Menunggu Pemabayaran.',
-                    'debug' => $response->body(),
-                ]);
-            }
-
-            $result = $response->json();
-            if (isset($result['Data']['Url'])) {
-                return response()->json([
-                    'success' => true,
-                    'url' => $result['Data']['Url'],
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => $result['Message'] ?? 'Gagal membuat transaksi iPaymu.',
-                    'debug' => $result,
-                ]);
-            }
-        } catch (\Exception $e) {
+        if (!$response->ok()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan koneksi: ' . $e->getMessage(),
+                'message' => 'Gagal koneksi ke iPaymu.',
+                'debug'   => $response->body(),
             ]);
         }
+
+        $result = $response->json();
+
+        if (isset($result['Status']) && $result['Status'] == 200) {
+            $redirectUrl = $result['Data']['Url'] ?? null;
+
+            return response()->json([
+                'success' => true,
+                'url'     => $redirectUrl,
+                'data'    => $result['Data'],
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => $result['Message'] ?? 'Gagal membuat transaksi iPaymu.',
+            'debug'   => $result,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan koneksi: ' . $e->getMessage(),
+        ]);
+    }
     }
 
     public function notify(Request $request)

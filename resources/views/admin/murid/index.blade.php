@@ -6,7 +6,7 @@
 <div class="min-h-screen bg-gradient-to-br from-green-50 to-green-50 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
         <!-- School Cards -->
-        <div class="space-y-6">
+        <div>
             @foreach($sekolahs as $sekolah)
                 <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
                     
