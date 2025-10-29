@@ -11,6 +11,7 @@ use App\Http\Controllers\Staf\StafController;
 use App\Http\Controllers\Staf\TagihanController;
 use App\Http\Controllers\Staf\KeuanganController;
 use App\Http\Controllers\Murid\MuridController;
+use App\Http\Controllers\Murid\ProfileController;
 
 // =======================
 // ROUTE AWAL (Landing Page)
@@ -126,6 +127,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/profile/edit', [\App\Http\Controllers\Guru\ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [\App\Http\Controllers\Guru\ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [\App\Http\Controllers\Guru\ProfileController::class, 'destroy'])->name('profile.destroy');
+
+        Route::get('/password/reset', [\App\Http\Controllers\Guru\ProfileController::class, 'showResetForm'])->name('password.reset');
+        Route::post('/password/reset', [\App\Http\Controllers\Guru\ProfileController::class, 'resetPassword'])->name('password.update');
     });
 
     // =======================
@@ -147,9 +151,13 @@ Route::middleware(['auth'])->group(function () {
             
 
         // Profile
-        Route::get('/profile', [\App\Http\Controllers\Murid\ProfileController::class, 'index'])->name('profile');
-        Route::get('/profile/edit', [\App\Http\Controllers\Murid\ProfileController::class, 'edit'])->name('profile.edit');
-        Route::post('/profile', [\App\Http\Controllers\Murid\ProfileController::class, 'update'])->name('profile.update.post');
-        Route::delete('/profile', [\App\Http\Controllers\Murid\ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+        Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update.post');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+        Route::get('/password/reset', [ProfileController::class, 'showResetForm'])->name('password.reset');
+        Route::post('/password/reset', [ProfileController::class, 'resetPassword'])->name('password.update');
+
     });
 });

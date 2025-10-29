@@ -3,9 +3,11 @@ namespace App\Http\Controllers\Murid;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Murid;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Murid;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
@@ -31,7 +33,6 @@ class ProfileController extends Controller
         return view('murid.profile.edit', compact('murid'));
     }
 
-    // Untuk handle POST dan PUT update profile
     public function update(Request $request)
     {
         $murid = Murid::where('user_id', auth()->id())->first();
@@ -54,11 +55,9 @@ class ProfileController extends Controller
             'tanggal_lahir_orangtua' => $request->tanggal_lahir_orangtua,
         ]);
         if ($request->hasFile('profile_image')) {
-            // Pastikan folder profile_image ada
             if (!\Storage::disk('public')->exists('profile_image')) {
                 \Storage::disk('public')->makeDirectory('profile_image');
             }
-            // Hapus gambar lama jika ada
             if ($murid->profile_image) {
                 \Storage::disk('public')->delete($murid->profile_image);
             }
@@ -68,4 +67,28 @@ class ProfileController extends Controller
         $murid->save();
         return redirect()->route('murid.profile')->with('success', 'Profil berhasil diperbarui!');
     }
+
+    public function showResetForm()
+    {
+        return view('murid.profile.reset-password');
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Password lama tidak sesuai.']);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return redirect()->route('murid.profile')->with('success', 'Password berhasil direset!');
+    }
+
 }

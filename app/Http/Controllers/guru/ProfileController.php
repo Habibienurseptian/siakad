@@ -5,6 +5,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+
 
 class ProfileController extends Controller
 {
@@ -67,5 +70,28 @@ class ProfileController extends Controller
         $guru->save();
 
         return redirect()->route('guru.profile')->with('success', 'Profil berhasil diperbarui!');
+    }
+
+    public function showResetForm()
+    {
+        return view('guru.profile.reset-password');
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Password lama tidak sesuai.']);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return redirect()->route('guru.profile')->with('success', 'Password berhasil direset!');
     }
 }

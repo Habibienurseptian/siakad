@@ -333,7 +333,6 @@
 </div>
 
 <style>
-    /* Custom scrollbar */
     .overflow-x-auto::-webkit-scrollbar {
         height: 6px;
     }
@@ -352,7 +351,6 @@
         background: #059669;
     }
     
-    /* Enhanced input styling */
     input[type="number"]::-webkit-outer-spin-button,
     input[type="number"]::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -363,7 +361,6 @@
         -moz-appearance: textfield;
     }
     
-    /* Smooth transitions */
     tr {
         transition: all 0.2s ease-in-out;
     }
@@ -374,49 +371,41 @@
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
     
-    /* Mobile specific optimizations */
     @media (max-width: 640px) {
         .container {
             padding-left: 1rem;
             padding-right: 1rem;
         }
         
-        /* Compact spacing for mobile */
         .space-y-2 > * + * {
             margin-top: 0.5rem;
         }
         
-        /* Touch-friendly inputs */
         input[type="number"] {
             min-height: 2.5rem;
             font-size: 14px;
         }
         
-        /* Improved button sizing */
         button {
             min-height: 2.5rem;
             padding: 0.5rem 1rem;
         }
         
-        /* Better text truncation */
         .truncate {
             max-width: 120px;
         }
         
-        /* Compact badges */
         .inline-flex.items-center.gap-1 {
             padding: 0.25rem 0.5rem;
         }
     }
     
-    /* Tablet optimizations */
     @media (min-width: 641px) and (max-width: 1024px) {
         .container {
             padding-left: 1.5rem;
             padding-right: 1.5rem;
         }
         
-        /* Better table spacing */
         table th, table td {
             padding: 0.75rem 1rem;
         }
@@ -426,21 +415,17 @@
         }
     }
     
-    /* Large screen optimizations */
     @media (min-width: 1025px) {
-        /* Enhanced hover effects */
         tr:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         
-        /* Better input focus states */
         input[type="number"]:focus {
             transform: scale(1.02);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
     }
     
-    /* Horizontal scroll indicator */
     .overflow-x-auto {
         position: relative;
     }
@@ -462,20 +447,17 @@
         opacity: 1;
     }
     
-    /* Enhanced focus visibility */
     select:focus, input:focus, button:focus {
         outline: 2px solid #10b981;
         outline-offset: 2px;
     }
     
-    /* Better loading states */
     .transition-all {
         transition-property: all;
         transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
         transition-duration: 200ms;
     }
     
-    /* Improved accessibility */
     @media (prefers-reduced-motion: reduce) {
         .transition-all,
         .transform,

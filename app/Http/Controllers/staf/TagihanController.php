@@ -23,20 +23,15 @@ class TagihanController extends Controller
             if ($sekolah) {
                 $muridsByKelas = [];
 
-                // Group by kelas_id dan ambil relasi kelas
                 $kelasGroups = $sekolah->murids->groupBy('kelas_id');
 
                 foreach ($kelasGroups as $kelasId => $muridsAll) {
-                    // Ambil nama kelas dari relasi
                     $kelasObj = Kelas::find($kelasId);
                     $namaKelas = $kelasObj ? strtoupper($kelasObj->nama_kelas) : 'TIDAK ADA KELAS';
-
-                    // Urutkan murid berdasarkan nama
                     $muridsAll = $muridsAll->sortBy(function($murid) {
                         return $murid->user->name ?? '';
                     })->values();
 
-                    // Filter berdasarkan status tagihan
                     if ($filterStatus === 'lunas') {
                         $muridsAll = $muridsAll->filter(function($murid) {
                             return $murid->tagihans->count() > 0 &&
@@ -53,7 +48,6 @@ class TagihanController extends Controller
                         })->values();
                     }
 
-                    // Filter pencarian nama atau nomor induk
                     $search = request('search');
                     if (!empty($search)) {
                         $muridsAll = $muridsAll->filter(function($murid) use ($search) {
@@ -64,18 +58,15 @@ class TagihanController extends Controller
                         })->values();
                     }
 
-                    // Hitung total tagihan belum dibayar
                     foreach ($muridsAll as $murid) {
                         $murid->totalUnpaidTagihan = $murid->getTotalUnpaidTagihan();
                     }
 
-                    // Skip kelas jika tidak ada murid setelah filter
                     if ($muridsAll->count() > 0) {
                         $muridsByKelas[$namaKelas] = $muridsAll;
                     }
                 }
 
-                // Urutkan kelas berdasarkan nama
                 ksort($muridsByKelas);
 
                 $sekolah->muridsByKelas = $muridsByKelas;
@@ -87,14 +78,12 @@ class TagihanController extends Controller
     }
 
 
-    // Tampilkan form input tagihan untuk satu murid
     public function create($murid_id)
     {
         $murid = Murid::with('sekolah', 'user', 'kelas')->findOrFail($murid_id);
         return view('staf.pembayaran.create', compact('murid'));
     }
 
-    // Simpan tagihan satu murid
     public function store(Request $request, $murid_id)
     {
         $request->validate([
@@ -146,12 +135,9 @@ class TagihanController extends Controller
         return redirect()->route('staf.pembayaran.index')->with('success', 'Tagihan berhasil ditambahkan');
     }
 
-    // Tampilkan form input tagihan untuk semua murid di sekolah tertentu
     public function createMass($sekolah_id)
     {
         $sekolah = Sekolah::with('murids.user', 'murids.kelas')->findOrFail($sekolah_id);
-        
-        // Group murids by kelas untuk tampilan yang lebih terorganisir
         $muridsByKelas = $sekolah->murids->groupBy('kelas_id')->map(function($murids, $kelasId) {
             $kelasObj = Kelas::find($kelasId);
             return [
@@ -165,7 +151,6 @@ class TagihanController extends Controller
         return view('staf.pembayaran.create_mass', compact('sekolah', 'muridsByKelas'));
     }
 
-    // Simpan tagihan untuk semua murid di sekolah tertentu
     public function storeMass(Request $request, $sekolah_id)
     {
         $request->validate([
@@ -283,7 +268,6 @@ class TagihanController extends Controller
 
         return redirect()->route('staf.pembayaran.detail', $tagihan->murid_id)->with('success', 'Tagihan berhasil diupdate');
     }
-
 
     public function destroy($id)
     {
