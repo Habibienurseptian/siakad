@@ -67,10 +67,10 @@
                                     <span>Edit</span>
                                 </button>
 
-                                <form action="{{ route('staf.pengumuman.terbaru.destroy', $pengumuman->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus pengumuman ini?')" class="flex-1 sm:flex-none">
+                                <form action="{{ route('staf.pengumuman.terbaru.destroy', $pengumuman->id) }}" method="POST" class="deleteTerbaruForm flex-1 sm:flex-none">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2">
+                                    <button type="button" class="deleteBtn w-full bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2">
                                         <i class="fas fa-trash"></i>
                                         <span>Hapus</span>
                                     </button>
@@ -141,10 +141,10 @@
                                     <span>Edit</span>
                                 </button>
 
-                                <form action="{{ route('staf.pengumuman.akademik.destroy', $pengumuman->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus pengumuman ini?')" class="flex-1 sm:flex-none">
+                                <form action="{{ route('staf.pengumuman.akademik.destroy', $pengumuman->id) }}" method="POST" class="deleteAkademikForm flex-1 sm:flex-none">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2">
+                                    <button type="button" class="deleteBtn w-full bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2">
                                         <i class="fas fa-trash"></i>
                                         <span>Hapus</span>
                                     </button>
@@ -173,6 +173,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // ======== Pengumuman Terbaru (Tambah) ========
@@ -252,6 +253,30 @@ document.addEventListener('DOMContentLoaded', function() {
     closeEditAkademikBtn?.addEventListener('click', closeModalEditAkademik);
     cancelEditAkademikBtn?.addEventListener('click', closeModalEditAkademik);
     modalEditAkademik?.addEventListener('click', e => { if (e.target === modalEditAkademik) closeModalEditAkademik(); });
+
+    // ======== SweetAlert Delete Confirmation ========
+    document.querySelectorAll('.deleteBtn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('form');
+            
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data pengumuman ini akan dihapus permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
 });
 </script>
 @endpush

@@ -134,9 +134,8 @@
                                                             <i class="fa-solid fa-pen-to-square"></i>
                                                         </a>
                                                         <form action="{{ route('admin.murid.destroy', $murid->id) }}" 
-                                                              method="POST" 
-                                                              onsubmit="return confirm('Yakin ingin menghapus data murid ini?')" 
-                                                              class="inline-block">
+                                                              method="POST"  
+                                                              class="form-delete inline-block"">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" 
@@ -203,9 +202,8 @@
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </a>
                                             <form action="{{ route('admin.murid.destroy', $murid->id) }}" 
-                                                  method="POST" 
-                                                  onsubmit="return confirm('Yakin ingin menghapus data murid ini?')" 
-                                                  class="flex-1">
+                                                  method="POST"  
+                                                  class="form-delete inline-block">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
@@ -265,15 +263,15 @@
 }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-    // Toggle all checkboxes
     function toggleAll(sekolahId, checked) {
         const checkboxes = document.querySelectorAll('.murid-checkbox-' + sekolahId);
         checkboxes.forEach(cb => cb.checked = checked);
         updateBulkActions(sekolahId);
     }
 
-    // Update bulk actions visibility and count
     function updateBulkActions(sekolahId) {
         const checkedBoxes = Array.from(document.querySelectorAll('.murid-checkbox-' + sekolahId + ':checked'));
         const uniqueIds = [...new Set(checkedBoxes.map(cb => cb.value))];
@@ -289,7 +287,6 @@
             bulkActions.classList.add('hidden');
         }
 
-        // Update checkbox select-all agar sinkron
         const allBoxes = Array.from(document.querySelectorAll('.murid-checkbox-' + sekolahId));
         const allUniqueIds = [...new Set(allBoxes.map(cb => cb.value))];
         if (selectAll) {
@@ -297,23 +294,59 @@
         }
     }
 
-    // Bulk delete function
     function bulkDelete(sekolahId) {
         const checkedBoxes = Array.from(document.querySelectorAll('.murid-checkbox-' + sekolahId + ':checked'));
         const uniqueIds = [...new Set(checkedBoxes.map(cb => cb.value))];
 
         if (uniqueIds.length === 0) {
-            alert('Pilih minimal satu murid untuk dihapus');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Tidak ada murid yang dipilih!',
+                text: 'Pilih minimal satu murid untuk dihapus.',
+                confirmButtonColor: '#16a34a'
+            });
             return;
         }
 
-        if (confirm(`Yakin ingin menghapus ${uniqueIds.length} data murid yang dipilih?`)) {
-            document.getElementById('bulk-ids-' + sekolahId).value = uniqueIds.join(',');
-            document.getElementById('bulk-delete-form-' + sekolahId).submit();
-        }
+        Swal.fire({
+            title: `Yakin ingin menghapus ${uniqueIds.length} murid terpilih?`,
+            text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('bulk-ids-' + sekolahId).value = uniqueIds.join(',');
+                document.getElementById('bulk-delete-form-' + sekolahId).submit();
+            }
+        });
     }
 
-    // Auto-submit per-school search form when input is cleared
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.form-delete').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Yakin ingin menghapus data murid ini?',
+                    text: 'Tindakan ini tidak dapat dibatalkan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+
     (function(){
         function submitFormIfEmpty(input) {
             var form = document.getElementById('search-form-' + input.dataset.sekolahId);
@@ -329,5 +362,7 @@
         });
     })();
 </script>
+
+
 
 @endsection

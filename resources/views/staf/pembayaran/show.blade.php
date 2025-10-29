@@ -242,7 +242,7 @@
                                             </svg>
                                             Edit
                                         </a>
-                                        <form action="{{ route('staf.pembayaran.destroy', $tagihan->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus tagihan ini?')">
+                                        <form action="{{ route('staf.pembayaran.destroy', $tagihan->id) }}" method="POST" class="form-delete inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="inline-flex items-center justify-center px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-medium rounded-lg shadow-sm transition-all duration-200 hover:scale-105">
@@ -300,4 +300,31 @@
 .text-teal-800 { color: #115e59; }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.form-delete').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Yakin ingin menghapus tagihan ini?',
+                text: 'Data yang dihapus tidak dapat dikembalikan!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
 @endsection

@@ -157,7 +157,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                                 </svg>
                                             </button>
-                                            <form action="{{ route('staf.keuangan.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data?')" class="inline">
+                                            <form action="{{ route('staf.keuangan.destroy', $item->id) }}" method="POST" class="form-delete inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-colors">
@@ -259,7 +259,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                                 </svg>
                                             </button>
-                                            <form action="{{ route('staf.keuangan.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data?')" class="inline">
+                                            <form action="{{ route('staf.keuangan.destroy', $item->id) }}" method="POST" class="form-delete inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-colors">
@@ -308,6 +308,8 @@
 
 @include('staf.keuangan.edit')
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     function openModal() {
         document.getElementById('keuanganModal').classList.remove('hidden');
@@ -329,7 +331,30 @@
         document.getElementById('editKeuanganModal').classList.add('hidden');
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
+        // 🔥 Tambahkan konfirmasi SweetAlert ke semua form hapus
+        document.querySelectorAll('.form-delete').forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault(); // cegah submit langsung
+
+                Swal.fire({
+                    title: 'Yakin ingin menghapus data ini?',
+                    text: 'Data yang dihapus tidak dapat dikembalikan!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        // 🕒 Auto-hide alert success jika ada
         const alerts = document.querySelectorAll('.alert-auto-hide');
         alerts.forEach(alert => {
             setTimeout(() => {

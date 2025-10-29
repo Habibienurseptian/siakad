@@ -312,18 +312,127 @@
     function konfirmasiLogout() {
         Swal.fire({
             title: 'Keluar dari Aplikasi?',
-            text: "Anda akan keluar dari sesi saat ini",
-            icon: 'question',
+            html: `
+                <div style="margin-top: 10px;">
+                    <div style="background: linear-gradient(135deg, #DC2626 0%, #764ba2 100%); 
+                                width: 80px; height: 80px; border-radius: 50%; 
+                                margin: 0 auto 20px; display: flex; align-items: center; 
+                                justify-content: center; box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" 
+                            fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                    </div>
+                    <p style="color: #6B7280; font-size: 15px; margin: 0; line-height: 1.6;">
+                        Anda akan keluar dari sesi saat ini.
+                    </p>
+                </div>
+            `,
+            icon: null,
             showCancelButton: true,
             confirmButtonColor: '#DC2626',
             cancelButtonColor: '#6B7280',
-            confirmButtonText: 'Ya, Keluar',
-            cancelButtonText: 'Batal',
-            reverseButtons: true
+            confirmButtonText: '<i class="fas fa-sign-out-alt"></i> Ya, Keluar',
+            cancelButtonText: '<i class="fas fa-times"></i> Batal',
+            reverseButtons: true,
+            customClass: {
+                popup: 'swal-modern-popup',
+                title: 'swal-modern-title',
+                htmlContainer: 'swal-modern-html',
+                confirmButton: 'swal-modern-confirm',
+                cancelButton: 'swal-modern-cancel'
+            },
+            buttonsStyling: false,
+            allowOutsideClick: false,
+            backdrop: `
+                rgba(0,0,0,0.4)
+                left top
+                no-repeat
+            `
         }).then((result) => {
             if (result.isConfirmed) {
+                // Tampilkan loading
+                Swal.fire({
+                    title: 'Keluar...',
+                    html: 'Mohon tunggu sebentar',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Submit form
                 document.getElementById('logout-form').submit();
             }
         });
+
+        // CSS untuk styling modern (tambahkan ke file CSS atau dalam <style> tag)
+        const style = document.createElement('style');
+        style.textContent = `
+            .swal-modern-popup {
+                border-radius: 20px !important;
+                padding: 30px !important;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+            }
+            
+            .swal-modern-title {
+                font-size: 24px !important;
+                font-weight: 700 !important;
+                color: #1F2937 !important;
+                margin-bottom: 10px !important;
+            }
+            
+            .swal-modern-html {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .swal-modern-confirm {
+                background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%) !important;
+                color: white !important;
+                border: none !important;
+                border-radius: 12px !important;
+                padding: 12px 30px !important;
+                font-size: 15px !important;
+                font-weight: 600 !important;
+                cursor: pointer !important;
+                transition: all 0.3s ease !important;
+                box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3) !important;
+                margin: 0 8px !important;
+            }
+            
+            .swal-modern-confirm:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4) !important;
+            }
+            
+            .swal-modern-cancel {
+                background: #F3F4F6 !important;
+                color: #4B5563 !important;
+                border: 2px solid #E5E7EB !important;
+                border-radius: 12px !important;
+                padding: 12px 30px !important;
+                font-size: 15px !important;
+                font-weight: 600 !important;
+                cursor: pointer !important;
+                transition: all 0.3s ease !important;
+                margin: 0 8px !important;
+            }
+            
+            .swal-modern-cancel:hover {
+                background: #E5E7EB !important;
+                border-color: #D1D5DB !important;
+                transform: translateY(-2px) !important;
+            }
+            
+            .swal2-actions {
+                margin-top: 25px !important;
+            }
+        `;
+        document.head.appendChild(style);
     }
 </script>

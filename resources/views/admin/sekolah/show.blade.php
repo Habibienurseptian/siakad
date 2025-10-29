@@ -184,13 +184,13 @@
 
                                                     <!-- Tombol Hapus -->
                                                     <form action="{{ route('admin.sekolah.kelas.destroy', [$sekolah->id, $kelasItem->nama_kelas]) }}" 
-                                                        method="POST" 
-                                                        onsubmit="return confirm('Yakin ingin menghapus kelas ini?')" 
-                                                        class="inline">
+                                                          method="POST" 
+                                                          class="form-delete inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" 
-                                                                class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg shadow">
+                                                        <button type="button" 
+                                                            class="btn-delete px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg shadow"
+                                                            data-nama="{{ $kelasItem->nama_kelas }}">
                                                             <i class="fa-solid fa-trash mr-1"></i>Hapus
                                                         </button>
                                                     </form>
@@ -224,3 +224,32 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.querySelectorAll('.btn-delete').forEach(button => {
+    button.addEventListener('click', function(e) {
+        const form = this.closest('.form-delete');
+        const namaKelas = this.dataset.nama;
+
+        Swal.fire({
+            title: 'Yakin ingin menghapus?',
+            html: `<b>${namaKelas.toUpperCase()}</b> akan dihapus secara permanen.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+});
+</script>
+@endpush
