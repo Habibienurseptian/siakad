@@ -13,7 +13,7 @@ class GuruController extends Controller
     // Tampilkan semua guru
     public function index(Request $request)
     {
-        $search = $request->input('search', []); // Default to an empty array
+        $search = $request->input('search', []); 
         $sekolahs = Sekolah::all();
         $gurus = [];
 
