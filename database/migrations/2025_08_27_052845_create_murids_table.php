@@ -14,9 +14,12 @@ return new class extends Migration
         Schema::create('murids', function (Blueprint $table) {
             $table->id();
             $table->string('nomor_induk')->unique();
-            $table->foreignId('sekolah_id')->constrained('sekolahs')->onDelete('cascade');
             $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade');
+            $table->unsignedBigInteger('sekolah_id')->nullable();
+            $table->unsignedBigInteger('user_id');
 
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('sekolah_id')->references('id')->on('sekolahs')->onDelete('set null');
             $table->timestamps();
         });
     }
