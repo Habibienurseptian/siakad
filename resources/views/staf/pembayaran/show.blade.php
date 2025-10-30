@@ -16,8 +16,7 @@
                     </svg>
                 </a>
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Detail Tagihan Siswa</h1>
-                    <p class="text-gray-600">Kelola dan pantau tagihan siswa dengan mudah</p>
+                    <h1 class="text-2xl font-bold text-gray-900 mb-2">Detail Tagihan Siswa</h1>
                 </div>
             </div>
         </div>

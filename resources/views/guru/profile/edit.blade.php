@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Edit Profil Guru')
+@section('title', 'Edit Profil')
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-5xl mx-auto">
@@ -25,7 +25,7 @@
                 <div class="bg-gradient-to-br from-green-500 to-emerald-600 px-6 py-8">
                     <div class="flex flex-col items-center">
                         <div class="relative mb-4">
-                            <img id="preview-image" src="{{ $guru->profile_image ? asset('storage/' . $guru->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($guru->user->name) . '&background=10B981&color=fff' }}" 
+                            <img id="preview-image" src="{{ $guru->profile_image ? asset('storage/' . $guru->profile_image) : asset('images/user.png') }}" 
                                  class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg">
                             <label for="profile_image" class="absolute bottom-0 right-0 w-9 h-9 bg-white rounded-full border-2 border-white shadow-lg flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">
                                 <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

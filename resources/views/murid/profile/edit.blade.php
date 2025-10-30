@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Edit Profil Murid')
+@section('title', 'Edit Profil')
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-5xl mx-auto">

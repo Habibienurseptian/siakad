@@ -313,19 +313,16 @@
         Swal.fire({
             title: 'Keluar dari Aplikasi?',
             html: `
-                <div style="margin-top: 10px;">
-                    <div style="background: linear-gradient(135deg, #DC2626 0%, #764ba2 100%); 
-                                width: 80px; height: 80px; border-radius: 50%; 
-                                margin: 0 auto 20px; display: flex; align-items: center; 
-                                justify-content: center; box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" 
+                <div class="logout-popup-content">
+                    <div class="logout-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
                             fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                             <polyline points="16 17 21 12 16 7"></polyline>
                             <line x1="21" y1="12" x2="9" y2="12"></line>
                         </svg>
                     </div>
-                    <p style="color: #6B7280; font-size: 15px; margin: 0; line-height: 1.6;">
+                    <p class="logout-text">
                         Anda akan keluar dari sesi saat ini.
                     </p>
                 </div>
@@ -353,7 +350,6 @@
             `
         }).then((result) => {
             if (result.isConfirmed) {
-                // Tampilkan loading
                 Swal.fire({
                     title: 'Keluar...',
                     html: 'Mohon tunggu sebentar',
@@ -364,73 +360,111 @@
                         Swal.showLoading();
                     }
                 });
-                
-                // Submit form
                 document.getElementById('logout-form').submit();
             }
         });
 
-        // CSS untuk styling modern (tambahkan ke file CSS atau dalam <style> tag)
         const style = document.createElement('style');
         style.textContent = `
+            /* === RESPONSIVE SWEETALERT MODERN === */
+
             .swal-modern-popup {
                 border-radius: 20px !important;
-                padding: 30px !important;
+                padding: 24px 18px !important;
                 box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+                max-width: 90% !important;
+                width: 400px !important;
             }
-            
+
             .swal-modern-title {
-                font-size: 24px !important;
+                font-size: clamp(18px, 2.5vw, 24px) !important;
                 font-weight: 700 !important;
                 color: #1F2937 !important;
                 margin-bottom: 10px !important;
             }
-            
-            .swal-modern-html {
-                margin: 0 !important;
-                padding: 0 !important;
+
+            .logout-popup-content {
+                margin-top: 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
             }
-            
+
+            .logout-icon {
+                background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+                width: clamp(60px, 20vw, 80px);
+                height: clamp(60px, 20vw, 80px);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+                margin-bottom: 20px;
+            }
+
+            .logout-text {
+                color: #6B7280;
+                font-size: clamp(14px, 2vw, 15px);
+                line-height: 1.6;
+                margin: 0;
+                padding: 0 10px;
+            }
+
+            .swal-modern-confirm,
+            .swal-modern-cancel {
+                border-radius: 12px !important;
+                padding: 12px 24px !important;
+                font-size: clamp(14px, 2vw, 15px) !important;
+                font-weight: 600 !important;
+                cursor: pointer !important;
+                transition: all 0.3s ease !important;
+                margin: 6px !important;
+            }
+
             .swal-modern-confirm {
                 background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%) !important;
                 color: white !important;
                 border: none !important;
-                border-radius: 12px !important;
-                padding: 12px 30px !important;
-                font-size: 15px !important;
-                font-weight: 600 !important;
-                cursor: pointer !important;
-                transition: all 0.3s ease !important;
                 box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3) !important;
-                margin: 0 8px !important;
             }
-            
+
             .swal-modern-confirm:hover {
                 transform: translateY(-2px) !important;
                 box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4) !important;
             }
-            
+
             .swal-modern-cancel {
                 background: #F3F4F6 !important;
                 color: #4B5563 !important;
                 border: 2px solid #E5E7EB !important;
-                border-radius: 12px !important;
-                padding: 12px 30px !important;
-                font-size: 15px !important;
-                font-weight: 600 !important;
-                cursor: pointer !important;
-                transition: all 0.3s ease !important;
-                margin: 0 8px !important;
             }
-            
+
             .swal-modern-cancel:hover {
                 background: #E5E7EB !important;
                 border-color: #D1D5DB !important;
                 transform: translateY(-2px) !important;
             }
-            
+
             .swal2-actions {
                 margin-top: 25px !important;
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+            }
+
+            /* Mobile optimization */
+            @media (max-width: 480px) {
+                .swal-modern-popup {
+                    padding: 20px 14px !important;
+                }
+                .swal-modern-confirm,
+                .swal-modern-cancel {
+                    width: 100% !important;
+                    text-align: center !important;
+                }
+                .swal2-actions {
+                    flex-direction: column !important;
+                }
             }
         `;
         document.head.appendChild(style);

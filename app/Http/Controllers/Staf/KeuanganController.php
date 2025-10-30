@@ -27,23 +27,26 @@ class KeuanganController extends Controller
             $pemasukanManual = \App\Models\Keuangan::where('jenis', 'pemasukan')
                 ->where('sekolah_id', $staf->sekolah_id)
                 ->orderBy('tanggal', 'desc')
+                ->orderBy('id', 'desc')
                 ->get();
             $pengeluaran = \App\Models\Keuangan::where('jenis', 'pengeluaran')
                 ->where('sekolah_id', $staf->sekolah_id)
                 ->orderBy('tanggal', 'desc')
+                ->orderBy('id', 'desc')
                 ->get();
         }
-        // Gabungkan dan urutkan semua pemasukan berdasarkan tanggal
         $pemasukan = $pemasukanManual->map(function($item) {
             $item->__tanggal_sort = $item->tanggal;
+            $item->__id_sort = $item->id;
             return $item;
         })->concat(
             $pemasukanTagihan->map(function($item) {
                 $item->__tanggal_sort = $item->updated_at;
+                $item->__id_sort = $item->id;
                 return $item;
             })
         )->sortByDesc(function($item) {
-            return $item->__tanggal_sort;
+            return [$item->__tanggal_sort, $item->__id_sort];
         })->values();
         $totalPemasukan = $pemasukan->sum(function($item) {
             if (isset($item->jumlah)) {

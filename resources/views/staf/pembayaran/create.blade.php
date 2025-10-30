@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Input Tagihan Murid')
+@section('title', 'Input Tagihan')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 py-6">
@@ -16,8 +16,7 @@
                     </svg>
                 </a>
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Input Tagihan Siswa</h1>
-                    <p class="text-gray-600">Buat tagihan baru untuk <span class="font-semibold text-green-600">{{ $murid->user->name ?? '-' }}</span></p>
+                    <h1 class="text-2xl font-bold text-gray-900 mb-2">Input Tagihan Siswa</h1>
                 </div>
             </div>
         </div>
@@ -243,23 +242,24 @@
                             </div>
                         </div>
 
-                        <!-- Total Preview -->
-                        <div class="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mr-4">
-                                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- Total Preview - Responsive -->
+                        <div class="mb-8 p-4 sm:p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                <div class="flex items-start sm:items-center">
+                                    <div class="w-10 h-10 sm:w-10 sm:h-10 bg-green-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0">
+                                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                                         </svg>
                                     </div>
                                     <div>
-                                        <h4 class="text-lg font-semibold text-green-800">Total Tagihan</h4>
-                                        <p class="text-sm text-green-600">Jumlah yang harus dibayar siswa</p>
+                                        <h4 class="text-base sm:text-lg font-semibold text-green-800">Total per Siswa</h4>
+                                        <p class="text-xs sm:text-sm text-green-600 mt-0.5">Jumlah tagihan yang akan dibuat untuk setiap siswa</p>
                                     </div>
                                 </div>
-                                <div class="text-right">
-                                    <div id="totalAmount" class="text-2xl font-bold text-green-800">Rp 0</div>
-                                    <div class="text-xs text-green-600">Akan diperbarui otomatis</div>
+                                
+                                <div class="text-left sm:text-right pl-13 sm:pl-0">
+                                    <div id="totalAmount" class="text-xl sm:text-2xl font-bold text-green-800">Rp 0</div>
+                                    <div class="text-xs text-green-600 mt-0.5">Akan diperbarui otomatis</div>
                                 </div>
                             </div>
                         </div>
@@ -288,7 +288,6 @@
     </div>
 </div>
 
-<!-- JavaScript for Real-time Total Calculation -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const inputs = document.querySelectorAll('input[type="number"]');

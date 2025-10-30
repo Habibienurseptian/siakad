@@ -4,30 +4,26 @@
 
 @section('content')
 <div class="container mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-    <!-- Hero -->
-    <div class="relative overflow-hidden shadow-xl rounded-lg p-8 text-white">
+    <!-- Hero Greeting -->
+    <div class="relative overflow-hidden shadow-xl rounded-lg p-6 sm:p-8 text-white">
         <div class="absolute inset-0 -z-10 bg-gradient-to-r from-green-800 via-green-700 to-green-800"></div>
 
-        <!-- Bubbles (hidden di mobile) -->
-        <div class="absolute top-0 left-1/4 w-40 h-40 bg-white opacity-20 rounded-full animate-bubble"></div>
-        <div class="absolute top-1/2 left-1/2 w-32 h-32 bg-white opacity-15 rounded-full animate-bubble delay-2000 hidden md:block"></div>
-        <div class="absolute top-1/3 right-1/4 w-48 h-48 bg-white opacity-10 rounded-full animate-bubble delay-4000 hidden md:block"></div>
-        <div class="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full animate-bubble delay-4000"></div>
-        <div class="absolute bottom-0 right-0 w-36 h-36 bg-white opacity-20 rounded-full animate-bubble delay-6000"></div>
+        <!-- Bubble Decoration -->
+        <div class="absolute top-0 left-1/4 w-32 h-32 bg-white opacity-20 rounded-full animate-bubble hidden sm:block"></div>
+        <div class="absolute top-1/2 left-1/2 w-24 h-24 bg-white opacity-15 rounded-full animate-bubble delay-2000 hidden md:block"></div>
+        <div class="absolute top-1/3 right-1/4 w-40 h-40 bg-white opacity-10 rounded-full animate-bubble delay-4000 hidden md:block"></div>
 
-        <p class="text-3xl font-semibold flex items-center">
+        <p class="text-2xl sm:text-3xl font-semibold flex items-center">
             <span class="inline-block w-3 h-3 bg-yellow-500 rounded-full mr-2 animate-pulse"></span>
             {{ $greeting }}
         </p>
 
-        <p class="text-5xl font-bold mt-4 flex items-center">
-            {{ $userName }}!
+        <p class="text-2xl sm:text-4xl md:text-5xl font-bold mt-3 flex items-center flex-wrap">
+            {{ $userName }} 👋
         </p>
 
-        <p class="mt-4 text-gray-100 text-lg flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-100 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 7h14v14H5V7z M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2"/>
-            </svg>
+        <p class="mt-3 text-gray-100 sm:text-lg text-base flex items-center flex-wrap">
+            <i class="fas fa-door-open mr-2"></i>
             Selamat datang di dashboard.
         </p>
     </div>
@@ -62,16 +58,16 @@
     {{-- PENGUMUMAN --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         {{-- PENGUMUMAN TERBARU --}}
-        <div class="bg-white shadow-md rounded-xl p-6 border border-gray-100">
-            <h2 class="text-xl font-bold text-gray-900 flex items-center">
+        <div class="bg-white shadow-md rounded-xl p-5 sm:p-6 border border-gray-100">
+            <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center">
                 <span class="icon-card mr-3">
                     <i class="fas fa-bullhorn text-white text-lg"></i>
                 </span>
                 Pengumuman Terbaru
             </h2>
-            <ul class="mt-6 space-y-4 max-h-64 overflow-y-auto">
+            <ul class="mt-5 space-y-4 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 @forelse($pengumuman_terbaru as $pengumuman)
-                <li class="p-4 rounded-lg border bg-gray-50 hover:bg-gray-100 transition">
+                <li class="p-4 rounded-lg border bg-gray-50 hover:bg-gray-100 transition text-sm sm:text-base">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                         <span class="flex-1 font-medium text-gray-800 break-words sm:whitespace-nowrap sm:overflow-hidden sm:text-ellipsis">
                             <i class="fas fa-newspaper text-green-600 mr-2"></i>
@@ -91,16 +87,16 @@
         </div>
 
         {{-- PENGUMUMAN AKADEMIK --}}
-        <div class="bg-white shadow-md rounded-xl p-6 border border-gray-100">
-            <h2 class="text-xl font-bold text-gray-900 flex items-center">
+        <div class="bg-white shadow-md rounded-xl p-5 sm:p-6 border border-gray-100">
+            <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center">
                 <span class="icon-card mr-3">
                     <i class="fas fa-graduation-cap text-white text-lg"></i>
                 </span>
                 Pengumuman Akademik
             </h2>
-            <ul class="mt-6 space-y-4 max-h-64 overflow-y-auto">
+            <ul class="mt-5 space-y-4 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 @forelse($pengumuman_akademik as $pengumuman)
-                <li class="p-4 rounded-lg border bg-gray-50 hover:bg-gray-100 transition">
+                <li class="p-4 rounded-lg border bg-gray-50 hover:bg-gray-100 transition text-sm sm:text-base">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                         <span class="flex-1 font-medium text-gray-800 break-words sm:whitespace-nowrap sm:overflow-hidden sm:text-ellipsis">
                             <i class="fas fa-chalkboard-teacher text-blue-600 mr-2"></i> 

@@ -248,22 +248,25 @@
                             </div>
                         </div>
 
-                        <!-- Total Preview -->
-                        <div class="mb-8 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- Total Preview - Responsive -->
+                        <div class="mb-8 p-4 sm:p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        
+                                <div class="flex items-start sm:items-center">
+                                    <div class="w-10 h-10 sm:w-10 sm:h-10 bg-green-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0">
+                                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                                         </svg>
                                     </div>
-                                    <span class="text-sm font-medium text-green-700">Total Tagihan</span>
-                                </div>
-                                <div class="text-right">
-                                    <div id="totalAmount" class="text-lg font-bold text-green-800">
-                                        Rp {{ number_format($tagihan->pembayaran_spp + $tagihan->uang_saku + $tagihan->uang_kegiatan + $tagihan->uang_spi + $tagihan->uang_haul_maulid + $tagihan->uang_khidmah_infaq + $tagihan->uang_zakat, 0, ',', '.') }}
+                                    <div>
+                                        <h4 class="text-base sm:text-lg font-semibold text-green-800">Total per Siswa</h4>
+                                        <p class="text-xs sm:text-sm text-green-600 mt-0.5">Jumlah tagihan yang akan dibuat untuk setiap siswa</p>
                                     </div>
-                                    <div class="text-xs text-green-600">Akan diperbarui otomatis</div>
+                                </div>
+                            
+                                <div class="text-left sm:text-right pl-13 sm:pl-0">
+                                    <div id="totalAmount" class="text-xl sm:text-2xl font-bold text-green-800">Rp 0</div>
+                                    <div class="text-xs text-green-600 mt-0.5">Akan diperbarui otomatis</div>
                                 </div>
                             </div>
                         </div>
@@ -292,7 +295,6 @@
     </div>
 </div>
 
-<!-- JavaScript for Real-time Total Calculation -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const inputs = document.querySelectorAll('input[type="number"]');

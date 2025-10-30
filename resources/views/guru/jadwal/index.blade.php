@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Jadwal')
+@section('title', 'Jadwal Mengajar')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
