@@ -15,8 +15,11 @@ class KeuanganController extends Controller
         $pemasukanTagihan = collect();
         $pemasukanManual = collect();
         $pengeluaran = collect();
+
         if ($staf && $staf->sekolah_id) {
             $sekolah = \App\Models\Sekolah::find($staf->sekolah_id);
+
+            // Pemasukan dari tagihan
             $pemasukanTagihan = Tagihan::with('murid.user')
                 ->where('status', 'lunas')
                 ->whereHas('murid', function($q) use ($staf) {
@@ -24,17 +27,23 @@ class KeuanganController extends Controller
                 })
                 ->orderBy('updated_at', 'desc')
                 ->get();
+
+            // Pemasukan manual
             $pemasukanManual = \App\Models\Keuangan::where('jenis', 'pemasukan')
                 ->where('sekolah_id', $staf->sekolah_id)
                 ->orderBy('tanggal', 'desc')
                 ->orderBy('id', 'desc')
                 ->get();
+
+            // Pengeluaran
             $pengeluaran = \App\Models\Keuangan::where('jenis', 'pengeluaran')
                 ->where('sekolah_id', $staf->sekolah_id)
                 ->orderBy('tanggal', 'desc')
                 ->orderBy('id', 'desc')
                 ->get();
         }
+
+        // Gabungkan pemasukan manual dan tagihan
         $pemasukan = $pemasukanManual->map(function($item) {
             $item->__tanggal_sort = $item->tanggal;
             $item->__id_sort = $item->id;
@@ -48,26 +57,33 @@ class KeuanganController extends Controller
         )->sortByDesc(function($item) {
             return [$item->__tanggal_sort, $item->__id_sort];
         })->values();
+
+        // Hitung total pemasukan
         $totalPemasukan = $pemasukan->sum(function($item) {
+            // Jika pemasukan manual
             if (isset($item->jumlah)) {
                 return $item->jumlah;
             }
-            return ($item->pembayaran_spp ?? 0)
-                + ($item->uang_saku ?? 0)
-                + ($item->uang_kegiatan ?? 0)
-                + ($item->uang_spi ?? 0)
-                + ($item->uang_haul_maulid ?? 0)
-                + ($item->uang_khidmah_infaq ?? 0)
-                + ($item->uang_zakat ?? 0);
+            // Jika pemasukan dari tagihan
+            return ($item->spp ?? 0)
+                + ($item->spi ?? 0)
+                + ($item->tagihan_kegiatan ?? 0)
+                + ($item->tagihan_semester_ganjil ?? 0)
+                + ($item->tagihan_semester_genap ?? 0)
+                + ($item->haul ?? 0);
         });
+
+        // Total pengeluaran
         $totalPengeluaran = $pengeluaran->sum(function($item) {
             return $item->jumlah ?? 0;
         });
+
         $totalKas = $totalPemasukan - $totalPengeluaran;
         $totalAll = $totalPemasukan + $totalPengeluaran;
         $persenPemasukan = $totalAll > 0 ? round(($totalPemasukan / $totalAll) * 100, 1) : 0;
         $persenPengeluaran = $totalAll > 0 ? round(($totalPengeluaran / $totalAll) * 100, 1) : 0;
         $persenKas = $totalAll > 0 ? round(($totalKas / $totalAll) * 100, 1) : 0;
+
         return view('staf.keuangan.index', [
             'pemasukan' => $pemasukan,
             'pengeluaran' => $pengeluaran,

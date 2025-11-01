@@ -12,11 +12,7 @@
             <div class="lg:col-span-2 space-y-4">
                 <h2 class="text-xl font-semibold text-slate-800 mb-4">Tagihan Aktif</h2>
                 
-                @forelse($belumLunas as $index => $tagihan)
-                    @php
-                        $subtotal = $totalList[$index] ?? 0;
-                    @endphp
-
+                @forelse($belumLunas as $tagihan)
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition-shadow">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -29,59 +25,51 @@
                         </div>
 
                         <div class="space-y-2 mb-4">
-                            @if($tagihan->pembayaran_spp > 0)
+                            @if($tagihan->spp > 0)
                                 <div class="flex justify-between text-sm">
                                     <span class="text-slate-600">SPP</span>
                                     <span class="font-medium text-slate-800">
-                                        Rp {{ number_format($tagihan->pembayaran_spp, 0, ',', '.') }}
+                                        Rp {{ number_format($tagihan->spp, 0, ',', '.') }}
                                     </span>
                                 </div>
                             @endif
-                            @if($tagihan->uang_saku > 0)
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-slate-600">Uang Saku</span>
-                                    <span class="font-medium text-slate-800">
-                                        Rp {{ number_format($tagihan->uang_saku, 0, ',', '.') }}
-                                    </span>
-                                </div>
-                            @endif
-                            @if($tagihan->uang_kegiatan > 0)
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-slate-600">Uang Kegiatan</span>
-                                    <span class="font-medium text-slate-800">
-                                        Rp {{ number_format($tagihan->uang_kegiatan, 0, ',', '.') }}
-                                    </span>
-                                </div>
-                            @endif
-                            @if($tagihan->uang_spi > 0)
+                            @if($tagihan->spi > 0)
                                 <div class="flex justify-between text-sm">
                                     <span class="text-slate-600">SPI</span>
                                     <span class="font-medium text-slate-800">
-                                        Rp {{ number_format($tagihan->uang_spi, 0, ',', '.') }}
+                                        Rp {{ number_format($tagihan->spi, 0, ',', '.') }}
                                     </span>
                                 </div>
                             @endif
-                            @if($tagihan->uang_haul_maulid > 0)
+                            @if($tagihan->tagihan_kegiatan > 0)
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-slate-600">Kegiatan</span>
+                                    <span class="font-medium text-slate-800">
+                                        Rp {{ number_format($tagihan->tagihan_kegiatan, 0, ',', '.') }}
+                                    </span>
+                                </div>
+                            @endif
+                            @if($tagihan->tagihan_semester_ganjil > 0)
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-slate-600">Semester Ganjil</span>
+                                    <span class="font-medium text-slate-800">
+                                        Rp {{ number_format($tagihan->tagihan_semester_ganjil, 0, ',', '.') }}
+                                    </span>
+                                </div>
+                            @endif
+                            @if($tagihan->tagihan_semester_genap > 0)
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-slate-600">Semester Genap</span>
+                                    <span class="font-medium text-slate-800">
+                                        Rp {{ number_format($tagihan->tagihan_semester_genap, 0, ',', '.') }}
+                                    </span>
+                                </div>
+                            @endif
+                            @if($tagihan->haul > 0)
                                 <div class="flex justify-between text-sm">
                                     <span class="text-slate-600">Haul/Maulid</span>
                                     <span class="font-medium text-slate-800">
-                                        Rp {{ number_format($tagihan->uang_haul_maulid, 0, ',', '.') }}
-                                    </span>
-                                </div>
-                            @endif
-                            @if($tagihan->uang_khidmah_infaq > 0)
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-slate-600">Khidmah/Infaq</span>
-                                    <span class="font-medium text-slate-800">
-                                        Rp {{ number_format($tagihan->uang_khidmah_infaq, 0, ',', '.') }}
-                                    </span>
-                                </div>
-                            @endif
-                            @if($tagihan->uang_zakat > 0)
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-slate-600">Zakat</span>
-                                    <span class="font-medium text-slate-800">
-                                        Rp {{ number_format($tagihan->uang_zakat, 0, ',', '.') }}
+                                        Rp {{ number_format($tagihan->haul, 0, ',', '.') }}
                                     </span>
                                 </div>
                             @endif
@@ -91,7 +79,7 @@
                             <div class="flex justify-between items-center">
                                 <span class="text-slate-600 font-medium">Total</span>
                                 <span class="text-xl font-bold text-blue-600">
-                                    Rp {{ number_format($subtotal, 0, ',', '.') }}
+                                    Rp {{ number_format($tagihan->subtotal, 0, ',', '.') }}
                                 </span>
                             </div>
                         </div>
@@ -117,8 +105,10 @@
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Pilih Tagihan</label>
                         <select id="tagihanSelect" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                            @foreach($belumLunas as $index => $tagihan)
-                                <option value="{{ $tagihan->id }}">{{ $tagihan->periode ?? '-' }} - Rp {{ number_format($totalList[$index] ?? 0, 0, ',', '.') }}</option>
+                            @foreach($belumLunas as $tagihan)
+                                <option value="{{ $tagihan->id }}">
+                                    {{ $tagihan->periode ?? '-' }} - Rp {{ number_format($tagihan->subtotal, 0, ',', '.') }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -132,11 +122,11 @@
                                 </div>
                                 <div>
                                     <p class="font-semibold text-slate-800">Pembayaran</p>
-                                    <p class="text-xs text-slate-500">Semua Bank</p>
+                                    <p class="text-xs text-emerald-600 font-medium">A.N. {{ $namaRekening ?? 'Yayasan Pendidikan' }}</p>
                                 </div>
                             </div>
                         </div>
-                        <button type="button" id="bayarBtn" data-id="{{ $tagihan->id }}" class="bayar-btn w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition" data-metode="ipaymu">
+                        <button type="button" id="bayarBtn" data-id="{{ $belumLunas->first()->id }}" class="bayar-btn w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition" data-metode="ipaymu">
                             Bayar Sekarang
                         </button>
                     </div>
@@ -202,6 +192,5 @@ document.getElementById('bayarBtn').addEventListener('click', async function() {
     }
 });
 </script>
-
 
 @endsection

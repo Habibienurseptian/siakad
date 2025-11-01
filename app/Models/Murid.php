@@ -6,19 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Murid extends Model
 {
-    public function getTotalUnpaidTagihan()
-    {
-        return $this->tagihans->where('status', '!=', 'lunas')->sum(function($tagihan) {
-            return ($tagihan->pembayaran_spp ?? 0)
-                + ($tagihan->uang_saku ?? 0)
-                + ($tagihan->uang_kegiatan ?? 0)
-                + ($tagihan->uang_spi ?? 0)
-                + ($tagihan->uang_haul_maulid ?? 0)
-                + ($tagihan->uang_khidmah_infaq ?? 0)
-                + ($tagihan->uang_zakat ?? 0);
-        });
-    }
-
     use HasFactory;
 
     protected $table = 'murids';
@@ -59,4 +46,20 @@ class Murid extends Model
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');
     }
+
+    public function getTotalUnpaidTagihan()
+    {
+        return $this->tagihans()
+                    ->where('status', '!=', 'lunas')
+                    ->get()
+                    ->sum(function($tagihan) {
+                        return ($tagihan->spp ?? 0)
+                            + ($tagihan->spi ?? 0)
+                            + ($tagihan->tagihan_kegiatan ?? 0)
+                            + ($tagihan->tagihan_semester_ganjil ?? 0)
+                            + ($tagihan->tagihan_semester_genap ?? 0)
+                            + ($tagihan->haul ?? 0);
+                    });
+    }
+
 }

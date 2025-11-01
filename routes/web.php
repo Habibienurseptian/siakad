@@ -95,7 +95,7 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/keuangan/{id}', [KeuanganController::class, 'update'])->name('keuangan.update');
             Route::delete('/keuangan/{id}', [KeuanganController::class, 'destroy'])->name('keuangan.destroy');
 
-            Route::prefix('pembayaran')->name('pembayaran.')->group(function () {
+            Route::prefix('tagihan')->name('tagihan.')->group(function () {
                 Route::get('/', [TagihanController::class, 'index'])->name('index');
                 Route::get('/{murid}/input', [TagihanController::class, 'create'])->name('input');
                 Route::post('/{murid}/input', [TagihanController::class, 'store'])->name('input.store');
@@ -106,6 +106,16 @@ Route::middleware(['auth'])->group(function () {
                 Route::get('/tagihan/{id}/edit', [TagihanController::class, 'edit'])->name('edit');
                 Route::put('/tagihan/{id}/edit', [TagihanController::class, 'update'])->name('update');
             });
+
+            Route::prefix('spp')->name('spp.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Staf\SppController::class, 'index'])->name('index');
+                Route::get('/create', [\App\Http\Controllers\Staf\SppController::class, 'create'])->name('create');
+                Route::post('/', [\App\Http\Controllers\Staf\SppController::class, 'store'])->name('store');
+                Route::get('/{id}/edit', [\App\Http\Controllers\Staf\SppController::class, 'edit'])->name('edit');
+                Route::put('/{id}', [\App\Http\Controllers\Staf\SppController::class, 'update'])->name('update');
+                Route::delete('/{id}', [\App\Http\Controllers\Staf\SppController::class, 'destroy'])->name('destroy');
+            });
+
         });
         
     });

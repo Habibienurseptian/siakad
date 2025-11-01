@@ -131,19 +131,14 @@
                                 </td>
                                 <td class="py-4 px-4">
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
-                                        </svg>
                                         Rp {{ number_format(
-                                            $item->jumlah ?? (
-                                                ($item->pembayaran_spp ?? 0) + 
-                                                ($item->uang_saku ?? 0) + 
-                                                ($item->uang_kegiatan ?? 0) + 
-                                                ($item->uang_spi ?? 0) + 
-                                                ($item->uang_haul_maulid ?? 0) + 
-                                                ($item->uang_khidmah_infaq ?? 0) + 
-                                                ($item->uang_zakat ?? 0)
-                                            ), 0, ',', '.'
+                                            ($item->spp ?? 0) + 
+                                            ($item->spi ?? 0) + 
+                                            ($item->tagihan_kegiatan ?? 0) + 
+                                            ($item->tagihan_semester_ganjil ?? 0) + 
+                                            ($item->tagihan_semester_genap ?? 0) + 
+                                            ($item->haul ?? 0),
+                                            0, ',', '.'
                                         ) }}
                                     </span>
                                 </td>
@@ -167,7 +162,7 @@
                                                 </button>
                                             </form>
                                         @else
-                                            <span class="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">Pembayaran Tagihan</span>
+                                            <span class="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">Tagihan</span>
                                         @endif
                                     </div>
                                 </td>

@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk Akun Sekolah</title>
+    <title>Assalafi Al Fithrah Meteseh Semarang | Login</title>
 
+
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-
     <!-- Google Fonts -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background: url('/images/sekolah.jpg') no-repeat center center fixed;
+            background: url('/images/bg-login.jpg') no-repeat center center fixed;
             background-size: cover;
         }
     </style>
@@ -25,10 +26,8 @@
 
         <!-- Header -->
         <div class="text-center mb-6">
-            <div class="mx-auto h-14 w-14 rounded-full flex items-center justify-center bg-green-500 text-green-600 shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-white">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
-                </svg>
+            <div class="mx-auto h-14 w-14 rounded-full flex items-center justify-center bg-white shadow-md">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-10 h-8">
             </div>
             <h2 class="text-2xl font-extrabold text-gray-900 mt-3">Selamat Datang</h2>
             <p class="mt-1 text-sm text-gray-600">Masuk untuk melanjutkan ke portal sekolah.</p>
@@ -49,7 +48,7 @@
                         name="login_id" 
                         id="login_id" 
                         placeholder="Masukkan identitas"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50 text-gray-900"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-gray-50 text-gray-900"
                         value="{{ old('login_id') }}" 
                         required>
                     @error('login_id')
@@ -66,9 +65,9 @@
                             name="password" 
                             id="password" 
                             placeholder="Masukkan kata sandi" 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50 text-gray-900 pr-12 transition-all duration-200" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-gray-50 text-gray-900 pr-12 transition-all duration-200" 
                             required>
-                        <button type="button" id="togglePassword" tabindex="-1" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500 hover:text-green-700 focus:outline-none">
+                        <button type="button" id="togglePassword" tabindex="-1" class="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 hover:text-emerald-700 focus:outline-none">
                             <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -85,7 +84,7 @@
             </div>
 
             <!-- Submit -->
-            <button type="submit" class="w-full mt-6 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+            <button type="submit" class="w-full mt-6 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-sm font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
                 Masuk
             </button>
         </form>
