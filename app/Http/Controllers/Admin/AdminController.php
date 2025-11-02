@@ -19,6 +19,22 @@ class AdminController extends Controller
             'totalStaf'  => Staf::count(),
             'totalSekolah' => Sekolah::count(),
         ];
-        return view('admin.dashboard', compact('data'));
+
+        // Mendapatkan waktu sekarang di zona Jakarta (WIB)
+        $hour = now()->setTimezone('Asia/Jakarta')->format('H');
+
+        if($hour < 12){
+            $greeting = 'Selamat Pagi';
+        } elseif($hour < 15){
+            $greeting = 'Selamat Siang';
+        } elseif($hour < 18){
+            $greeting = 'Selamat Sore';
+        } else {
+            $greeting = 'Selamat Malam';
+        }
+
+        $userName = auth()->user()->name ?? 'Pengguna';
+
+        return view('admin.dashboard', compact('data', 'greeting', 'userName'));
     }
 }

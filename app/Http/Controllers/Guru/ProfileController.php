@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
-
 class ProfileController extends Controller
 {
     public function index()
@@ -41,8 +40,8 @@ class ProfileController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email',
-            'nip' => 'nullable|string',
-            'phone' => 'nullable|interger|max:14',
+            'jenis_kelamin' => 'nullable|in:Laki-laki,Perempuan',
+            'phone' => 'nullable|string|max:14',
             'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -52,7 +51,7 @@ class ProfileController extends Controller
         $user->save();
 
         // Update guru table
-        $guru->nip = $request->nip;
+        $guru->jenis_kelamin = $request->jenis_kelamin;
         $guru->phone = $request->phone;
         $guru->tempat_lahir = $request->tempat_lahir;
         $guru->tanggal_lahir = $request->tanggal_lahir;
@@ -63,10 +62,16 @@ class ProfileController extends Controller
         $guru->tanggal_lahir_orangtua = $request->tanggal_lahir_orangtua;
         $guru->status_marital = $request->status_marital;
         $guru->nama_orangtua = $request->nama_orangtua;
+        
         if ($request->hasFile('profile_image')) {
+            // Hapus gambar lama jika ada
+            if ($guru->profile_image) {
+                Storage::disk('public')->delete($guru->profile_image);
+            }
             $path = $request->file('profile_image')->store('profile_images', 'public');
             $guru->profile_image = $path;
         }
+        
         $guru->save();
 
         return redirect()->route('guru.profile')->with('success', 'Profil berhasil diperbarui!');

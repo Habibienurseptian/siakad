@@ -5,48 +5,11 @@
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-green-50 to-green-50 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
-        <!-- Notifikasi Sukses -->
-        @if(session('success'))
-            <div class="mb-6 bg-white border-l-4 border-green-500 rounded-lg shadow-sm p-4 flex items-start gap-3 animate-fade-in">
-                <div class="flex-shrink-0">
-                    <i class="fa-solid fa-circle-check text-green-500 text-xl"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-green-800 font-medium">{{ session('success') }}</p>
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-green-600 hover:text-green-800">
-                    <i class="fa-solid fa-times"></i>
-                </button>
-            </div>
-        @endif
-
-        <!-- Notifikasi Error -->
-        @if($errors->any())
-            <div class="mb-6 bg-white border-l-4 border-red-500 rounded-lg shadow-sm p-4 animate-fade-in">
-                <div class="flex items-start gap-3">
-                    <div class="flex-shrink-0">
-                        <i class="fa-solid fa-circle-exclamation text-red-500 text-xl"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-red-800 font-semibold mb-2">Terjadi kesalahan:</p>
-                        <ul class="space-y-1">
-                            @foreach($errors->all() as $error)
-                                <li class="text-red-700 text-sm flex items-start gap-2">
-                                    <span class="text-red-400">•</span>
-                                    <span>{{ $error }}</span>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        @endif
-
         <!-- School Cards -->
         <div>
             @foreach($sekolahs as $sekolah)
-                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
-                    
+                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden mb-6">
+
                     <!-- Card Header -->
                     <div class="bg-gradient-to-r from-green-500 to-green-600 px-4 sm:px-6 py-4">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

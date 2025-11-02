@@ -1,48 +1,58 @@
 <?php
+
 namespace App\Http\Controllers\Murid;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Murid;
 use App\Models\User;
 
 class ProfileController extends Controller
 {
+    // Halaman profil murid
     public function index()
     {
-        $murid = Murid::where('user_id', auth()->id())->first();
+        $murid = Murid::with('user')->where('user_id', Auth::id())->firstOrFail();
         return view('murid.profile.index', compact('murid'));
     }
 
-    public function destroy()
-    {
-        $murid = Murid::where('user_id', Auth::id())->first();
-        if ($murid->profile_image) {
-            Storage::disk('public')->delete($murid->profile_image);
-        }
-        $murid->delete();
-        return redirect('/')->with('success', 'Profil berhasil dihapus!');
-    }
-
+    // Halaman edit profil (tanpa upload foto)
     public function edit()
     {
-        $murid = \App\Models\Murid::where('user_id', auth()->id())->first();
+        $murid = Murid::with('user')->where('user_id', Auth::id())->firstOrFail();
         return view('murid.profile.edit', compact('murid'));
     }
 
+    // Update data profil tanpa ubah foto
     public function update(Request $request)
     {
-        $murid = Murid::where('user_id', auth()->id())->first();
+        $murid = Murid::where('user_id', Auth::id())->firstOrFail();
+        $user = Auth::user();
+
+        // Validasi input
         $request->validate([
-            'phone' => 'nullable|integer|max:14',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:14',
             'nama_orangtua' => 'nullable|string|max:255',
-            'telepon_orangtua' => 'nullable|integer|max:14',
-            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'telepon_orangtua' => 'nullable|string|max:14',
+            'jenis_kelamin' => 'nullable|in:Laki-laki,Perempuan',
+            'warga_negara' => 'nullable|string|max:100',
+            'tempat_lahir' => 'nullable|string|max:100',
+            'tanggal_lahir' => 'nullable|date',
+            'alamat' => 'nullable|string',
+            'kode_pos' => 'nullable|string|max:5',
+            'tempat_lahir_orangtua' => 'nullable|string|max:100',
+            'tanggal_lahir_orangtua' => 'nullable|date',
         ]);
-        $murid->fill([
+
+        // Update data user
+        $user->update(['email' => $request->email]);
+
+        // Update data murid (tanpa ubah foto)
+        $murid->update([
+            'jenis_kelamin' => $request->jenis_kelamin,
             'phone' => $request->phone,
             'nama_orangtua' => $request->nama_orangtua,
             'telepon_orangtua' => $request->telepon_orangtua,
@@ -54,25 +64,18 @@ class ProfileController extends Controller
             'tempat_lahir_orangtua' => $request->tempat_lahir_orangtua,
             'tanggal_lahir_orangtua' => $request->tanggal_lahir_orangtua,
         ]);
-        if ($request->hasFile('profile_image')) {
-            if (!\Storage::disk('public')->exists('profile_image')) {
-                \Storage::disk('public')->makeDirectory('profile_image');
-            }
-            if ($murid->profile_image) {
-                \Storage::disk('public')->delete($murid->profile_image);
-            }
-            $path = $request->file('profile_image')->store('profile_image', 'public');
-            $murid->profile_image = $path;
-        }
-        $murid->save();
-        return redirect()->route('murid.profile')->with('success', 'Profil berhasil diperbarui!');
+
+        return redirect()->route('murid.profile')
+            ->with('success', 'Profil berhasil diperbarui!');
     }
 
+    // Tampilkan form reset password
     public function showResetForm()
     {
         return view('murid.profile.reset-password');
     }
 
+    // Proses reset password
     public function resetPassword(Request $request)
     {
         $request->validate([
@@ -81,14 +84,14 @@ class ProfileController extends Controller
         ]);
 
         $user = Auth::user();
+
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Password lama tidak sesuai.']);
         }
 
-        $user->password = Hash::make($request->new_password);
-        $user->save();
+        $user->update(['password' => Hash::make($request->new_password)]);
 
-        return redirect()->route('murid.profile')->with('success', 'Password berhasil direset!');
+        return redirect()->route('murid.profile')
+            ->with('success', 'Password berhasil diubah!');
     }
-
 }

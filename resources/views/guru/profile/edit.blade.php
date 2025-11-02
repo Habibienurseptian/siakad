@@ -86,6 +86,15 @@
                                 </div>
                             </div>
                             <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Kelamin</label>
+                                <select name="jenis_kelamin" 
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
+                                    <option value="">Pilih Jenis Kelamin</option>
+                                    <option value="Laki-laki" {{ old('jenis_kelamin', $guru->jenis_kelamin) == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                    <option value="Perempuan" {{ old('jenis_kelamin', $guru->jenis_kelamin) == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                </select>
+                            </div>
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">No. Telepon</label>
                                 <input type="number" name="phone" value="{{ old('phone', $guru->phone) }}" 
                                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" oninput="if(this.value.length > 13) this.value = this.value.slice(0, 14);">

@@ -17,13 +17,13 @@
                     </h1>
                     <p class="text-gray-600 mt-1">Data sekolah yang terdaftar</p>
                 </div>
-                <a href="{{ route('admin.sekolah.create') }}" 
+                <button id="openModalTambahBtn"
                     class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-600 text-white font-semibold rounded-lg shadow-lg hover:from-green-700 hover:to-green-700 hover:shadow-xl transition-all duration-200">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Tambah Sekolah
-                </a>
+                </button>
             </div>
         </div>
 
@@ -76,13 +76,19 @@
                             </svg>
                         </a>
 
-                        <a href="{{ route('admin.sekolah.edit', $sekolah->id) }}" 
-                            class="flex-1 flex items-center justify-center px-3 py-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition-colors duration-200"
+                        <button 
+                            type="button"
+                            class="openEditBtn flex-1 flex items-center justify-center px-3 py-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition-colors duration-200"
+                            data-id="{{ $sekolah->id }}"
+                            data-nama="{{ $sekolah->nama }}"
+                            data-alamat="{{ $sekolah->alamat }}"
+                            data-kepala="{{ $sekolah->kepala_sekolah }}"
+                            data-npsn="{{ $sekolah->npsn }}"
                             title="Edit">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                             </svg>
-                        </a>
+                        </button>
 
                         <form action="{{ route('admin.sekolah.destroy', $sekolah->id) }}" method="POST" class="flex-1 delete-form">
                             @csrf
@@ -108,40 +114,97 @@
                     </div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">Belum Ada Data Sekolah</h3>
                     <p class="text-gray-500 mb-6">Mulai tambahkan data sekolah untuk mengelola informasi sekolah</p>
-                    <a href="{{ route('admin.sekolah.create') }}" 
+                    <button id="openModalTambahBtnEmpty"
                         class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-600 text-white font-semibold rounded-lg shadow-lg hover:from-green-700 hover:to-green-700 transition-all">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
                         Tambah Sekolah Pertama
-                    </a>
+                    </button>
                 </div>
             </div>
             @endforelse
         </div>
     </div>
 </div>
+
+<!-- Modal Tambah Sekolah -->
+@include('admin.sekolah.create')
+
+<!-- Modal Edit Sekolah -->
+@include('admin.sekolah.edit')
+
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-document.querySelectorAll('.delete-btn').forEach(button => {
-    button.addEventListener('click', function (e) {
-        const form = this.closest('form');
-        Swal.fire({
-            title: 'Yakin ingin menghapus?',
-            text: "Data sekolah ini akan dihapus secara permanen!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc2626',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                form.submit();
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    // ======== Modal Tambah Sekolah ========
+    const modalTambah = document.getElementById('modalTambahSekolah');
+    const openTambahBtn = document.getElementById('openModalTambahBtn');
+    const openTambahBtnEmpty = document.getElementById('openModalTambahBtnEmpty');
+    const closeTambahBtn = document.getElementById('closeModalTambahBtn');
+    const cancelTambahBtn = document.getElementById('cancelModalTambahBtn');
+
+    const openModalTambah = () => modalTambah.classList.replace('hidden', 'flex');
+    const closeModalTambah = () => modalTambah.classList.replace('flex', 'hidden');
+    
+    if (modalTambah) {
+        openTambahBtn?.addEventListener('click', openModalTambah);
+        openTambahBtnEmpty?.addEventListener('click', openModalTambah);
+        closeTambahBtn?.addEventListener('click', closeModalTambah);
+        cancelTambahBtn?.addEventListener('click', closeModalTambah);
+        modalTambah.addEventListener('click', e => { if (e.target === modalTambah) closeModalTambah(); });
+    }
+
+    // ======== Modal Edit Sekolah ========
+    const modalEdit = document.getElementById('modalEditSekolah');
+    const closeEditBtn = document.getElementById('closeModalEditBtn');
+    const cancelEditBtn = document.getElementById('cancelModalEditBtn');
+
+    document.querySelectorAll('.openEditBtn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const nama = this.dataset.nama;
+            const alamat = this.dataset.alamat;
+            const kepala = this.dataset.kepala;
+            const npsn = this.dataset.npsn;
+            
+            document.getElementById('editNama').value = nama;
+            document.getElementById('editAlamat').value = alamat;
+            document.getElementById('editKepala').value = kepala;
+            document.getElementById('editNpsn').value = npsn;
+            document.getElementById('editSekolahForm').action = `/admin/sekolah/${id}`;
+
+            modalEdit.classList.replace('hidden', 'flex');
+        });
+    });
+
+    const closeModalEdit = () => modalEdit.classList.replace('flex', 'hidden');
+    closeEditBtn?.addEventListener('click', closeModalEdit);
+    cancelEditBtn?.addEventListener('click', closeModalEdit);
+    modalEdit?.addEventListener('click', e => { if (e.target === modalEdit) closeModalEdit(); });
+
+    // ======== SweetAlert Delete Confirmation ========
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function (e) {
+            const form = this.closest('form');
+            Swal.fire({
+                title: 'Yakin ingin menghapus?',
+                text: "Data sekolah ini akan dihapus secara permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
         });
     });
 });

@@ -8,7 +8,7 @@
         <!-- School Cards -->
         <div>
             @foreach($sekolahs as $sekolah)
-                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden mb-6">
                     
                     <!-- Card Header -->
                     <div class="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4">
@@ -109,9 +109,9 @@
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <div class="flex items-center gap-3">
                                                         <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-200">
-                                                            <img src="{{ $murid->profile_image ? asset('storage/' . $murid->profile_image) : asset('images/user.png') }}" 
-                                                                 alt="Profile" 
-                                                                 class="w-full h-full object-cover">
+                                                            <img src="{{ $murid->profile_image && Storage::disk('public')->exists($murid->profile_image) ? Storage::url($murid->profile_image) : asset('images/user.png') }}" 
+                                                            alt="Profile" 
+                                                            class="w-full h-full object-cover">
                                                         </div>
                                                         <span class="text-sm font-medium text-gray-900">{{ $murid->user ? $murid->user->name : '-' }}</span>
                                                     </div>

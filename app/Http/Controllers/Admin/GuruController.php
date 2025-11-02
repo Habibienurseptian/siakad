@@ -52,6 +52,7 @@ class GuruController extends Controller
             'nip' => 'required|string|unique:gurus,nip',
             'sekolah_id' => 'required|exists:sekolahs,id',
             'phone' => 'nullable|string|max:25',
+            'jenis_kelamin' => 'nullable|in:Laki-laki,Perempuan',
         ], [
             'nip.unique' => 'Nomor Induk Pegawai (NIP) sudah digunakan. Harap gunakan NIP lain.',
             'email.unique' => 'Email sudah terdaftar, silakan gunakan email lain.',
@@ -67,6 +68,7 @@ class GuruController extends Controller
         Guru::create([
             'user_id' => $user->id,
             'nip' => $request->nip,
+            'jenis_kelamin' => $request->jenis_kelamin, // Tambahkan ini
             'sekolah_id' => $request->sekolah_id,
             'phone' => $request->phone,
         ]);
@@ -100,22 +102,44 @@ class GuruController extends Controller
             'nip' => 'required|string|unique:gurus,nip,' . $guru->id,
             'sekolah_id' => 'required|exists:sekolahs,id',
             'phone' => 'nullable|string|max:25',
+            'jenis_kelamin' => 'nullable|in:Laki-laki,Perempuan', // Tambahkan validasi
             'password' => 'nullable|string|min:8',
+            'tempat_lahir' => 'nullable|string|max:255',
+            'tanggal_lahir' => 'nullable|date',
+            'warga_negara' => 'nullable|string|max:255',
+            'alamat' => 'nullable|string',
+            'kode_pos' => 'nullable|string|max:10',
+            'status_marital' => 'nullable|in:menikah,belum menikah,cerai',
+            'nama_orangtua' => 'nullable|string|max:255',
+            'tempat_lahir_orangtua' => 'nullable|string|max:255',
+            'tanggal_lahir_orangtua' => 'nullable|date',
         ], [
             'nip.unique' => 'Nomor Induk Pegawai (NIP) sudah digunakan. Harap gunakan NIP lain.',
             'email.unique' => 'Email sudah terdaftar, silakan gunakan email lain.',
         ]);
 
+        // Update user data
         $guru->user->update([
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->filled('password') ? Hash::make($request->password) : $guru->user->password,
         ]);
 
+        // Update guru data
         $guru->update([
             'nip' => $request->nip,
+            'jenis_kelamin' => $request->jenis_kelamin, // Tambahkan ini
             'sekolah_id' => $request->sekolah_id,
             'phone' => $request->phone,
+            'tempat_lahir' => $request->tempat_lahir,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'warga_negara' => $request->warga_negara,
+            'alamat' => $request->alamat,
+            'kode_pos' => $request->kode_pos,
+            'status_marital' => $request->status_marital,
+            'nama_orangtua' => $request->nama_orangtua,
+            'tempat_lahir_orangtua' => $request->tempat_lahir_orangtua,
+            'tanggal_lahir_orangtua' => $request->tanggal_lahir_orangtua,
         ]);
 
         return redirect()->route('admin.guru.index')->with('success', 'Data guru berhasil diupdate!');
@@ -157,6 +181,5 @@ class GuruController extends Controller
             \DB::rollBack();
             return redirect()->route('admin.guru.index')->with('error', 'Gagal menghapus data guru: ' . $e->getMessage());
         }
-}
-
+    }
 }

@@ -15,31 +15,45 @@
             <p class="text-sm text-gray-500 mt-1">Perbarui informasi profil Anda</p>
         </div>
 
-        <form action="{{ route('murid.profile.update.post') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('murid.profile.update.post') }}" method="POST">
             @csrf
             
             <!-- Profile Card -->
             <div class="bg-white rounded-3xl shadow-sm overflow-hidden mb-6">
-                <!-- Profile Image Section -->
+                <!-- Profile Image Section (View Only) -->
                 <div class="bg-gradient-to-br from-green-500 to-emerald-600 px-6 py-8">
                     <div class="flex flex-col items-center">
                         <div class="relative mb-4">
-                            <img id="preview-image" src="{{ $murid->profile_image ? asset('storage/' . $murid->profile_image) : asset('images/user.png') }}" 
+                            <img src="{{ $murid->profile_image ? asset('storage/' . $murid->profile_image) : asset('images/user.png') }}" 
                                  class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg">
-                            <label for="profile_image" class="absolute bottom-0 right-0 w-9 h-9 bg-white rounded-full border-2 border-white shadow-lg flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">
-                                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                            </label>
-                            <input type="file" id="profile_image" name="profile_image" class="hidden" accept="image/*" onchange="previewImage(event)">
                         </div>
-                        <p class="text-white text-sm">Klik icon kamera untuk mengubah foto</p>
+                        <p class="text-white text-sm opacity-90">Foto profil tidak dapat diubah</p>
                     </div>
                 </div>
 
                 <!-- Form Fields -->
                 <div class="px-6 py-8 space-y-6">
+                    <!-- Data Akun Section -->
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <div class="w-1 h-4 bg-blue-500 rounded-full"></div>
+                            Data Akun
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" name="email" value="{{ old('email', $murid->user->email) }}" 
+                                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                       placeholder="email@example.com" required>
+                                @error('email')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-100"></div>
+
                     <!-- Data Pribadi Section -->
                     <div>
                         <h3 class="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -48,6 +62,18 @@
                         </h3>
                         <div class="space-y-4">
                             <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Kelamin</label>
+                                <select name="jenis_kelamin" 
+                                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
+                                    <option value="">Pilih Jenis Kelamin</option>
+                                    <option value="Laki-laki" {{ old('jenis_kelamin', $murid->jenis_kelamin) == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                    <option value="Perempuan" {{ old('jenis_kelamin', $murid->jenis_kelamin) == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                </select>
+                                @error('jenis_kelamin')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Warga Negara</label>
                                 <input type="text" name="warga_negara" value="{{ old('warga_negara', $murid->warga_negara) }}" 
                                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
@@ -55,9 +81,9 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">No. Telepon</label>
-                                <input type="number" name="phone" value="{{ old('phone', $murid->phone) }}" 
+                                <input type="text" name="phone" value="{{ old('phone', $murid->phone) }}" 
                                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                                       placeholder="08xxxxxxxxxx" oninput="if(this.value.length > 13) this.value = this.value.slice(0, 14);">
+                                       placeholder="08xxxxxxxxxx" maxlength="14">
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
@@ -92,10 +118,9 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">No. Telepon Orang Tua/Wali</label>
-                                <input type="number" name="telepon_orangtua" value="{{ old('telepon_orangtua', $murid->telepon_orangtua) }}" 
+                                <input type="text" name="telepon_orangtua" value="{{ old('telepon_orangtua', $murid->telepon_orangtua) }}" 
                                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                                       placeholder="08xxxxxxxxxx"
-                                       oninput="if(this.value.length > 13) this.value = this.value.slice(0, 14);">
+                                       placeholder="08xxxxxxxxxx" maxlength="14">
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
@@ -132,7 +157,7 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Kode Pos</label>
                                 <input type="text" name="kode_pos" value="{{ old('kode_pos', $murid->kode_pos) }}" 
                                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                                       placeholder="12345">
+                                       placeholder="12345" maxlength="5">
                             </div>
                         </div>
                     </div>
@@ -153,15 +178,4 @@
         </form>
     </div>
 </div>
-
-<script>
-function previewImage(event) {
-    const reader = new FileReader();
-    reader.onload = function() {
-        const preview = document.getElementById('preview-image');
-        preview.src = reader.result;
-    }
-    reader.readAsDataURL(event.target.files[0]);
-}
-</script>
 @endsection

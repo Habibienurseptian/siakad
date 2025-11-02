@@ -13,6 +13,7 @@ class Murid extends Model
     protected $fillable = [
         'user_id',
         'nomor_induk',
+        'jenis_kelamin',
         'kelas_id',
         'sekolah_id',
         'phone',

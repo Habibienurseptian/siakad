@@ -29,7 +29,7 @@ class StafController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8',
             'nip' => 'required|string|unique:stafs,nip',
             'sekolah_id' => 'required|exists:sekolahs,id',
             'bidang' => 'nullable|string|max:100',
@@ -37,18 +37,21 @@ class StafController extends Controller
             'nip.unique' => 'Nomor Induk Pegawai (NIP) sudah digunakan. Harap gunakan NIP lain.',
             'email.unique' => 'Email sudah terdaftar, silakan gunakan email lain.',
         ]);
+        
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'staf',
         ]);
+        
         Staf::create([
             'user_id' => $user->id,
             'nip' => $request->nip,
             'sekolah_id' => $request->sekolah_id,
             'bidang' => $request->bidang,
         ]);
+        
         return redirect()->route('admin.staf.index')->with('success', 'Data staf berhasil ditambahkan!');
     }
 
@@ -69,34 +72,52 @@ class StafController extends Controller
     public function update(Request $request, $id)
     {
         $staf = Staf::with(['user', 'sekolah'])->findOrFail($id);
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $staf->user->id,
             'nip' => 'required|string|unique:stafs,nip,' . $staf->id,
             'sekolah_id' => 'required|exists:sekolahs,id',
             'bidang' => 'nullable|string|max:100',
+            'password' => 'nullable|string|min:8',
         ], [
             'nip.unique' => 'Nomor Induk Pegawai (NIP) sudah digunakan. Harap gunakan NIP lain.',
             'email.unique' => 'Email sudah terdaftar, silakan gunakan email lain.',
         ]);
         
-        $staf->user->update([
+        // Update user data
+        $userData = [
             'name' => $request->name,
             'email' => $request->email,
-        ]);
+        ];
+        
+        // Jika password diisi, maka update password
+        if ($request->filled('password')) {
+            $userData['password'] = Hash::make($request->password);
+        }
+        
+        $staf->user->update($userData);
+        
+        // Update staf data
         $staf->update([
             'nip' => $request->nip,
             'sekolah_id' => $request->sekolah_id,
             'bidang' => $request->bidang,
         ]);
+        
         return redirect()->route('admin.staf.index')->with('success', 'Data staf berhasil diupdate!');
     }
 
     public function destroy($id)
     {
         $staf = Staf::with('user')->findOrFail($id);
-        $staf->user->delete();
+        
+        if($staf->user) {
+            $staf->user->delete();
+        }
+        
         $staf->delete();
+        
         return redirect()->route('admin.staf.index')->with('success', 'Data staf berhasil dihapus!');
     }
 }

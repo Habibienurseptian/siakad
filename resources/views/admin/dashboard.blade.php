@@ -3,23 +3,6 @@
 @section('title', 'Dashboard')
 
 @section('content')
-@php
-    // Mendapatkan waktu sekarang di zona Jakarta (WIB)
-    $hour = now()->setTimezone('Asia/Jakarta')->format('H');
-
-    if($hour < 12){
-        $greeting = 'Selamat Pagi';
-    } elseif($hour < 15){
-        $greeting = 'Selamat Siang';
-    } elseif($hour < 18){
-        $greeting = 'Selamat Sore';
-    } else {
-        $greeting = 'Selamat Malam';
-    }
-
-    $userName = auth()->user()->name ?? 'Pengguna';
-@endphp
-
 <div class="container mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
     <div class="relative overflow-hidden shadow-xl rounded-lg p-8 text-white">
         <div class="absolute inset-0 -z-10 bg-gradient-to-r from-green-800 via-green-700 to-green-800"></div>

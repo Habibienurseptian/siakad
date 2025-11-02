@@ -74,6 +74,12 @@
                             <div class="border-t border-gray-50"></div>
                             
                             <div class="flex justify-between py-2">
+                                <span class="text-sm text-gray-500">Jenis Kelamin</span>
+                                <span class="text-sm font-medium text-gray-900 uppercase">{{ $murid->jenis_kelamin ?? '-' }}</span>
+                            </div>
+                            <div class="border-t border-gray-50"></div>
+                            
+                            <div class="flex justify-between py-2">
                                 <span class="text-sm text-gray-500">Tempat Lahir</span>
                                 <span class="text-sm font-medium text-gray-900 text-right uppercase">{{ $murid->tempat_lahir ?? '-' }}</span>
                             </div>

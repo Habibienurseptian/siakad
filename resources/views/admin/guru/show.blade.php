@@ -92,6 +92,15 @@
                             Data Pribadi
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Tambahkan Jenis Kelamin di sini -->
+                            <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                                <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 flex items-center gap-2">
+                                    <i class="fa-solid fa-venus-mars text-gray-400"></i>
+                                    Jenis Kelamin
+                                </dt>
+                                <dd class="text-sm font-medium text-gray-900">{{ strtoupper($guru->jenis_kelamin ?? '-') }}</dd>
+                            </div>
+                            
                             <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
                                 <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 flex items-center gap-2">
                                     <i class="fa-solid fa-map-marker-alt text-gray-400"></i>
@@ -124,20 +133,20 @@
                                 <dd class="text-sm font-medium text-gray-900">{{ strtoupper($guru->kode_pos ?? '-') }}</dd>
                             </div>
                             
+                            <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                                <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 flex items-center gap-2">
+                                    <i class="fa-solid fa-phone text-gray-400"></i>
+                                    Nomor Telepon
+                                </dt>
+                                <dd class="text-sm font-medium text-gray-900">{{ strtoupper($guru->phone ?? '-') }}</dd>
+                            </div>
+                            
                             <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors md:col-span-2">
                                 <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 flex items-center gap-2">
                                     <i class="fa-solid fa-home text-gray-400"></i>
                                     Alamat
                                 </dt>
                                 <dd class="text-sm font-medium text-gray-900">{{ strtoupper($guru->alamat ?? '-') }}</dd>
-                            </div>
-
-                            <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors md:col-span-2">
-                                <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 flex items-center gap-2">
-                                    <i class="fa-solid fa-phone text-gray-400"></i>
-                                    Nomor Telepon
-                                </dt>
-                                <dd class="text-sm font-medium text-gray-900">{{ strtoupper($guru->phone ?? '-') }}</dd>
                             </div>
                         </div>
                     </div>

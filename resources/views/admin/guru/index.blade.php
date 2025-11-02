@@ -9,7 +9,7 @@
         <!-- School Cards -->
         <div>
             @foreach($sekolahs as $sekolah)
-                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden mb-6">
                     
                     <!-- Card Header -->
                     <div class="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4">
